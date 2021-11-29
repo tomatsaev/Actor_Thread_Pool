@@ -1,5 +1,8 @@
 package bgu.atd.a1;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
  * this class represents a deferred result i.e., an object that eventually will
  * be resolved to hold a result of some operation, the class allows for getting
@@ -17,6 +20,11 @@ package bgu.atd.a1;
  */
 public class Promise<T>{
 
+	private Boolean isResolved = false;
+	private ConcurrentLinkedQueue<callback> callbacks;
+	private T value;
+	private String actionName;
+
 	/**
 	 *
 	 * @return the resolved value if such exists (i.e., if this object has been
@@ -26,9 +34,30 @@ public class Promise<T>{
 	 *             not yet resolved
 	 */
 	public T get() {
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		if(value != null){
+			return value;
+		}
+		else{
+			throw new IllegalStateException("Promise did not resolve. No value to return");
+		}
 	}
+
+    /**
+     *
+     * @param actionName
+     *
+     */
+	/*package*/ final void setActionName(String actionName){
+	    this.actionName = actionName;
+    }
+
+    /**
+     *
+     * @return actionName
+     */
+    /*package*/ final String getActionName(){
+        return this.actionName;
+    }
 
 	/**
 	 *
@@ -36,10 +65,7 @@ public class Promise<T>{
 	 *         {@link #resolve(java.lang.Object)} has been called on this object
 	 *         before.
 	 */
-	public boolean isResolved() {
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
-	}
+	public boolean isResolved() { return isResolved; }
 
 
 	/**
@@ -55,9 +81,17 @@ public class Promise<T>{
 	 * @param value
 	 *            - the value to resolve this promise object with
 	 */
-	public void resolve(T value){
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+	public synchronized void resolve(T value){
+		if(isResolved()){
+			throw new IllegalStateException("Promise already resolved");
+		}
+		isResolved = true;
+
+		this.value = value;
+
+		while(callbacks.peek() != null){
+			callbacks.poll().call();
+		}
 	}
 
 	/**
@@ -74,7 +108,11 @@ public class Promise<T>{
 	 *            the callback to be called when the promise object is resolved
 	 */
 	public void subscribe(callback callback) {
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		if(isResolved){
+			callback.call();
+		}
+		else{
+			this.callbacks.add(callback);
+		}
 	}
 }

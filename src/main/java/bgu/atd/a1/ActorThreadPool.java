@@ -1,6 +1,11 @@
 package bgu.atd.a1;
 
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * represents an actor thread pool - to understand what this class does please
@@ -14,7 +19,11 @@ import java.util.Map;
  */
 public class ActorThreadPool {
 
-	/**
+	private Map<String, PrivateState> actors;
+	private Map<String, Lock> locksByID;
+	private Map<String, Queue<Action>> actionsByActorID;
+
+    /**
 	 * creates a {@link ActorThreadPool} which has nthreads. Note, threads
 	 * should not get started until calling to the {@link #start()} method.
 	 *
@@ -27,8 +36,8 @@ public class ActorThreadPool {
 	 *            pool
 	 */
 	public ActorThreadPool(int nthreads) {
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		actors = new ConcurrentHashMap<>(nthreads);
+        actionsByActorID = new ConcurrentHashMap<>(nthreads);
 	}
 
 	/**
@@ -36,8 +45,7 @@ public class ActorThreadPool {
 	 * @return actors
 	 */
 	public Map<String, PrivateState> getActors(){
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		return actors;
 	}
 	
 	/**
@@ -46,10 +54,8 @@ public class ActorThreadPool {
 	 * @return actor's private state
 	 */
 	public PrivateState getPrivateState(String actorId){
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		return actors.get(actorId);
 	}
-
 
 	/**
 	 * submits an action into an actor to be executed by a thread belongs to
@@ -63,8 +69,11 @@ public class ActorThreadPool {
 	 *            actor's private state (actor's information)
 	 */
 	public void submit(Action<?> action, String actorId, PrivateState actorState) {
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		actors.putIfAbsent(actorId, actorState);
+		actionsByActorID.putIfAbsent(actorId, new ConcurrentLinkedQueue<>());
+		locksByID.putIfAbsent(actorId, new ReentrantLock());
+
+		actionsByActorID.get(actorId).add(action);
 	}
 
 	/**

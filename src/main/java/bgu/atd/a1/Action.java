@@ -15,6 +15,11 @@ import java.util.Collection;
  */
 public abstract class Action<R> {
 
+    private Promise<R> promise;
+    private Action<R> dependent = null; // the parent Action
+    private callback callback;
+    private Integer dependencies_counter;
+
 	/**
      * start handling the action - note that this method is protected, a thread
      * cannot call it directly.
@@ -49,9 +54,11 @@ public abstract class Action<R> {
      * @param callback the callback to execute once all the results are resolved
      */
     protected final void then(Collection<? extends Action<?>> actions, callback callback) {
-       	//TODO: replace method body with real implementation
-        throw new UnsupportedOperationException("Not Implemented Yet.");
-   
+        this.callback = callback;
+        for (Action action: actions) {
+            action.dependent = this;
+        }
+        dependencies_counter = actions.size();
     }
 
     /**
@@ -61,17 +68,14 @@ public abstract class Action<R> {
      * @param result - the action calculated result
      */
     protected final void complete(R result) {
-       	//TODO: replace method body with real implementation
-        throw new UnsupportedOperationException("Not Implemented Yet.");
-   
+       	this.promise.resolve(result);
     }
     
     /**
      * @return action's promise (result)
      */
     public final Promise<R> getResult() {
-    	//TODO: replace method body with real implementation
-        throw new UnsupportedOperationException("Not Implemented Yet.");
+    	return this.promise;
     }
     
     /**
@@ -94,15 +98,13 @@ public abstract class Action<R> {
 	 * @param actionName
 	 */
 	public void setActionName(String actionName){
-        //TODO: replace method body with real implementation
-        throw new UnsupportedOperationException("Not Implemented Yet.");
+        this.promise.setActionName(actionName);
 	}
 	
 	/**
 	 * @return action's name
 	 */
 	public String getActionName(){
-        //TODO: replace method body with real implementation
-        throw new UnsupportedOperationException("Not Implemented Yet.");
+        return this.promise.getActionName();
 	}
 }
