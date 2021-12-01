@@ -1,5 +1,7 @@
 package bgu.atd.a1;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,41 +21,45 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ActorThreadPool {
 
-	private Map<String, PrivateState> actors;
-	private Map<String, Lock> locksByID;
-	private Map<String, Queue<Action>> actionsByActorID;
+	private Integer nthreads;
+	protected Boolean terminate = false;
+	List<Thread> threads = new LinkedList<>();
+	private Map<String, PrivateState> actors = new ConcurrentHashMap<>();
+	private Map<String, Lock> locksByID = new ConcurrentHashMap<>();
+	private Map<String, Queue<Action>> actionsByActorID = new ConcurrentHashMap<>();
+	List<Action> waitingList = new LinkedList<>();
 
-    /**
+	/**
 	 * creates a {@link ActorThreadPool} which has nthreads. Note, threads
 	 * should not get started until calling to the {@link #start()} method.
-	 *
+	 * <p>
 	 * Implementors note: you may not add other constructors to this class nor
 	 * you allowed to add any other parameter to this constructor - changing
 	 * this may cause automatic tests to fail..
 	 *
-	 * @param nthreads
-	 *            the number of threads that should be started by this thread
-	 *            pool
+	 * @param nthreads the number of threads that should be started by this thread
+	 *                 pool
 	 */
 	public ActorThreadPool(int nthreads) {
-		actors = new ConcurrentHashMap<>(nthreads);
-        actionsByActorID = new ConcurrentHashMap<>(nthreads);
+		this.nthreads = nthreads;
 	}
 
 	/**
 	 * getter for actors
+	 *
 	 * @return actors
 	 */
-	public Map<String, PrivateState> getActors(){
+	public Map<String, PrivateState> getActors() {
 		return actors;
 	}
-	
+
 	/**
 	 * getter for actor's private state
+	 *
 	 * @param actorId actor's id
 	 * @return actor's private state
 	 */
-	public PrivateState getPrivateState(String actorId){
+	public PrivateState getPrivateState(String actorId) {
 		return actors.get(actorId);
 	}
 
@@ -61,12 +67,9 @@ public class ActorThreadPool {
 	 * submits an action into an actor to be executed by a thread belongs to
 	 * this thread pool
 	 *
-	 * @param action
-	 *            the action to execute
-	 * @param actorId
-	 *            corresponding actor's id
-	 * @param actorState
-	 *            actor's private state (actor's information)
+	 * @param action     the action to execute
+	 * @param actorId    corresponding actor's id
+	 * @param actorState actor's private state (actor's information)
 	 */
 	public void submit(Action<?> action, String actorId, PrivateState actorState) {
 		actors.putIfAbsent(actorId, actorState);
@@ -80,23 +83,48 @@ public class ActorThreadPool {
 	 * closes the thread pool - this method interrupts all the threads and waits
 	 * for them to stop - it is returns *only* when there are no live threads in
 	 * the queue.
-	 *
+	 * <p>
 	 * after calling this method - one should not use the queue anymore.
 	 *
-	 * @throws InterruptedException
-	 *             if the thread that shut down the threads is interrupted
+	 * @throws InterruptedException if the thread that shut down the threads is interrupted
 	 */
 	public void shutdown() throws InterruptedException {
+		terminate = true;
+		for (Thread thread: threads) {
+			thread.interrupt();
+		}
 		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
 	/**
 	 * start the threads belongs to this thread pool
 	 */
 	public void start() {
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		for (int i = 0; i < nthreads; i++) {
+			Thread worker = new Thread(this::task);
+			worker.setName("Worker " + (i));
+			threads.add(worker);
+			worker.start();
+		}
 	}
 
+	private void task(){
+		try{
+			while (!terminate) {
+				for (String actor : locksByID.keySet()) {
+					if (locksByID.get(actor).tryLock()) {
+						Action currAction = actionsByActorID.get(actor).poll();
+						if(currAction != null){
+							currAction.handle(this, actor, actors.get(actor));
+						}
+						locksByID.get(actor).unlock();
+					}
+				}
+			}
+		}
+		catch (Exception e){
+			System.out.println("Exception caught");
+		}
+
+	}
 }

@@ -15,10 +15,12 @@ import java.util.Collection;
  */
 public abstract class Action<R> {
 
-    private Promise<R> promise;
-    private Action<R> dependent = null; // the parent Action
-    private callback callback;
-    private Integer dependencies_counter;
+    private Promise<R> promise = new Promise<>();
+    private ActorThreadPool pool;
+    private Action<R> parent = null;
+    private Integer dependencies_counter = 0;
+    private String actorID;
+    private PrivateState actorState;
 
 	/**
      * start handling the action - note that this method is protected, a thread
@@ -40,6 +42,12 @@ public abstract class Action<R> {
     *
     */
    /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
+       this.pool = pool;
+       this.actorID = actorId;
+       this.actorState = actorState;
+//       if(dependencies_counter == 0){
+//           complete();
+//       }
    }
     
     
@@ -54,9 +62,10 @@ public abstract class Action<R> {
      * @param callback the callback to execute once all the results are resolved
      */
     protected final void then(Collection<? extends Action<?>> actions, callback callback) {
-        this.callback = callback;
+        this.promise.subscribe(callback);
         for (Action action: actions) {
-            action.dependent = this;
+            action.parent = this;
+            pool.waitingList.add(this);
         }
         dependencies_counter = actions.size();
     }
@@ -68,7 +77,11 @@ public abstract class Action<R> {
      * @param result - the action calculated result
      */
     protected final void complete(R result) {
-       	this.promise.resolve(result);
+        this.promise.resolve(result);
+        if(parent != null){
+            parent.dependencies_counter--;
+            parent.handle(parent.pool, parent.actorID, parent.actorState);
+        }
     }
     
     /**
@@ -89,8 +102,7 @@ public abstract class Action<R> {
 	 * 				actor's private state (actor's information)
      */
 	public void sendMessage(Action<?> action, String actorId, PrivateState actorState){
-        //TODO: replace method body with real implementation
-        throw new UnsupportedOperationException("Not Implemented Yet.");
+        pool.submit(action, actorId, actorState);
 	}
 	
 	/**
