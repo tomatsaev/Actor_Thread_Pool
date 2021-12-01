@@ -20,6 +20,7 @@ public abstract class Action<R> {
     private Action<R> parent = null;
     private Integer dependencies_counter = 0;
     private String actorID;
+    private Boolean started = false;
     private PrivateState actorState;
 
 	/**
@@ -42,12 +43,18 @@ public abstract class Action<R> {
     *
     */
    /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
-       this.pool = pool;
-       this.actorID = actorId;
-       this.actorState = actorState;
-//       if(dependencies_counter == 0){
-//           complete();
-//       }
+        if(!started) {
+            this.started = true;
+            this.pool = pool;
+            this.actorID = actorId;
+            this.actorState = actorState;
+            start();
+        }
+
+        if (!this.promise.isResolved()){
+
+        }
+
    }
     
     
@@ -63,10 +70,13 @@ public abstract class Action<R> {
      */
     protected final void then(Collection<? extends Action<?>> actions, callback callback) {
         this.promise.subscribe(callback);
+        if (actions.isEmpty()) {
+            return;
+        }
         for (Action action: actions) {
             action.parent = this;
-            pool.waitingList.add(this);
         }
+        pool.waitingList.add(this);
         dependencies_counter = actions.size();
     }
 
@@ -80,7 +90,8 @@ public abstract class Action<R> {
         this.promise.resolve(result);
         if(parent != null){
             parent.dependencies_counter--;
-            parent.handle(parent.pool, parent.actorID, parent.actorState);
+            if (parent.dependencies_counter == 0)
+                pool.submit(parent, parent.actorID, parent.actorState);
         }
     }
     
