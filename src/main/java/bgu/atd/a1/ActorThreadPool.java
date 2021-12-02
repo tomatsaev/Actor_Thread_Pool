@@ -27,7 +27,6 @@ public class ActorThreadPool {
 	private Map<String, PrivateState> actors = new ConcurrentHashMap<>();
 	private Map<String, Lock> locksByID = new ConcurrentHashMap<>();
 	private Map<String, Queue<Action>> actionsByActorID = new ConcurrentHashMap<>();
-	List<Action> waitingList = new LinkedList<>();
 
 	/**
 	 * creates a {@link ActorThreadPool} which has nthreads. Note, threads

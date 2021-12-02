@@ -22,6 +22,7 @@ public abstract class Action<R> {
     private String actorID;
     private Boolean started = false;
     private PrivateState actorState;
+    private callback callback;
 
 	/**
      * start handling the action - note that this method is protected, a thread
@@ -43,16 +44,15 @@ public abstract class Action<R> {
     *
     */
    /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
-        if(!started) {
+        if(!started && !this.promise.isResolved()) {
             this.started = true;
             this.pool = pool;
             this.actorID = actorId;
             this.actorState = actorState;
             start();
         }
-
-        if (!this.promise.isResolved()){
-
+        else{
+            callback.call();
         }
 
    }
@@ -69,14 +69,13 @@ public abstract class Action<R> {
      * @param callback the callback to execute once all the results are resolved
      */
     protected final void then(Collection<? extends Action<?>> actions, callback callback) {
-        this.promise.subscribe(callback);
+        this.callback = callback;
         if (actions.isEmpty()) {
             return;
         }
         for (Action action: actions) {
             action.parent = this;
         }
-        pool.waitingList.add(this);
         dependencies_counter = actions.size();
     }
 

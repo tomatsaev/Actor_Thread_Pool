@@ -1,6 +1,5 @@
 package bgu.atd.a1;
 
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -81,7 +80,7 @@ public class Promise<T>{
 	 * @param value
 	 *            - the value to resolve this promise object with
 	 */
-	public synchronized void resolve(T value){
+	public void resolve(T value){
 		if(isResolved()){
 			throw new IllegalStateException("Promise already resolved");
 		}
