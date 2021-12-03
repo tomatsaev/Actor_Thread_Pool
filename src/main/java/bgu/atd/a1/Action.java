@@ -1,6 +1,7 @@
 package bgu.atd.a1;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * an abstract class that represents an action that may be executed using the
@@ -17,8 +18,7 @@ public abstract class Action<R> {
 
     private Promise<R> promise = new Promise<>();
     private ActorThreadPool pool;
-    private Action<R> parent = null;
-    private Integer dependencies_counter = 0;
+    private AtomicInteger dependenciesCounter = new AtomicInteger(0);
     private String actorID;
     private Boolean started = false;
     private PrivateState actorState;
@@ -73,10 +73,14 @@ public abstract class Action<R> {
         if (actions.isEmpty()) {
             return;
         }
-        for (Action action: actions) {
-            action.parent = this;
+        dependenciesCounter.addAndGet(actions.size());
+        for (Action<?> action: actions) {
+            action.getResult().subscribe(() ->
+            {
+                if (dependenciesCounter.decrementAndGet() == 0)
+                    pool.submit(this, this.actorID, this.actorState);
+            });
         }
-        dependencies_counter = actions.size();
     }
 
     /**
@@ -87,11 +91,6 @@ public abstract class Action<R> {
      */
     protected final void complete(R result) {
         this.promise.resolve(result);
-        if(parent != null){
-            parent.dependencies_counter--;
-            if (parent.dependencies_counter == 0)
-                pool.submit(parent, parent.actorID, parent.actorState);
-        }
     }
 
     /**
