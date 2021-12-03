@@ -89,10 +89,13 @@ public class ActorThreadPool {
 	 */
 	public void shutdown() throws InterruptedException {
 		terminate = true;
-		for (Thread thread: threads) {
-			thread.interrupt();
-		}
-		// TODO: replace method body with real implementation
+        for (Thread t : threads) {
+            try {
+                t.join();
+            } catch (Exception e) {
+                throw new InterruptedException("Shut down Interruption");
+            }
+        }
 	}
 
 	/**
@@ -108,22 +111,20 @@ public class ActorThreadPool {
 	}
 
 	private void task(){
-		try{
-			while (!terminate) {
-				for (String actor : locksByID.keySet()) {
-					if (locksByID.get(actor).tryLock()) {
-						Action currAction = actionsByActorID.get(actor).poll();
-						if(currAction != null){
-							currAction.handle(this, actor, actors.get(actor));
-						}
-						locksByID.get(actor).unlock();
-					}
-				}
-			}
-		}
-		catch (Exception e){
-			System.out.println("Exception caught");
-		}
-
-	}
+        while (!terminate) {
+            for (String actor : locksByID.keySet()) {
+                try {
+                    if (locksByID.get(actor).tryLock()) {
+                        Action currAction = actionsByActorID.get(actor).poll();
+                        if (currAction != null) {
+                            currAction.handle(this, actor, actors.get(actor));
+                        }
+                        locksByID.get(actor).unlock();
+                    }
+                } catch (Exception e) {
+                    System.out.println("Exception caught");
+                }
+            }
+        }
+    }
 }
