@@ -20,7 +20,7 @@ import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 import com.google.gson.*;
-import jdk.internal.net.http.common.Pair;
+import javafx.util.Pair;
 
 /**
  * A class describing the simulator for part 2 of the assignment
@@ -70,15 +70,15 @@ public class Simulator {
 
         // TODO: check inserting by order (phases)
         for(Action action : phase1Actions.keySet()) {
-            actorThreadPool.submit(action, phase1Actions.get(action).fst, phase1Actions.get(action).snd);
+            actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
         }
 
         for(Action action : phase2Actions.keySet()) {
-            actorThreadPool.submit(action, phase2Actions.get(action).fst, phase2Actions.get(action).snd);
+            actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
         }
 
         for(Action action : phase2Actions.keySet()) {
-            actorThreadPool.submit(action, phase2Actions.get(action).fst, phase2Actions.get(action).snd);
+            actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
         }
 
 	}
