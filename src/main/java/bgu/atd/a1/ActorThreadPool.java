@@ -102,6 +102,7 @@ public class ActorThreadPool {
 		}
 		for (Thread thread: threads) {
 			thread.interrupt();
+// TODO: check thread.join vs thread.interrupt
 		}
 	}
 
@@ -118,23 +119,20 @@ public class ActorThreadPool {
 	}
 
 	private void task(){
-		try{
-			while (!terminate) {
-				for (String actor : locksByID.keySet()) {
-					if (locksByID.get(actor).tryLock()) {
-						Action<?> currAction = actionsByActorID.get(actor).poll();
-						if(currAction != null){
-							currAction.handle(this, actor, actors.get(actor));
-						}
-						locksByID.get(actor).unlock();
-					}
-				}
-			}
-		}
-		catch (Exception e){
-			System.out.println("Exception caught");
-			e.printStackTrace();
-		}
-
-	}
+        while (!terminate) {
+            for (String actor : locksByID.keySet()) {
+                try {
+                    if (locksByID.get(actor).tryLock()) {
+                        Action<?> currAction = actionsByActorID.get(actor).poll();
+                        if (currAction != null) {
+                            currAction.handle(this, actor, actors.get(actor));
+                        }
+                        locksByID.get(actor).unlock();
+                    }
+                } catch (Exception e) {
+                    System.out.println("Exception caught");
+                }
+            }
+        }
+    }
 }
