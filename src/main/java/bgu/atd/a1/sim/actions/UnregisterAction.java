@@ -4,16 +4,16 @@ import bgu.atd.a1.Action;
 import sun.java2d.pipe.hw.AccelTypedVolatileImage;
 
 public class UnregisterAction extends Action<String> {
-    Integer student;
+    String student;
     String course;
 
-    public UnregisterAction(Integer student, String course) {
+    public UnregisterAction(String student, String course) {
         this.student = student;
         this.course = course;
         setActionName("Unregister");
     }
 
-    public Integer getStudent() {
+    public String getStudent() {
         return student;
     }
 

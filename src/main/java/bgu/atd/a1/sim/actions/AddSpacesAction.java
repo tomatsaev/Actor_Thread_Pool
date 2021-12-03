@@ -12,6 +12,14 @@ public class AddSpacesAction extends Action<String> {
         setActionName("Add Spaces");
     }
 
+    public String getCourse() {
+        return course;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
     @Override
     protected void start() {
 

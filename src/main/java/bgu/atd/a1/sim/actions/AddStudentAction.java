@@ -4,9 +4,9 @@ import bgu.atd.a1.Action;
 
 public class AddStudentAction extends Action<String> {
     String department;
-    Integer student;
+    String student;
 
-    public AddStudentAction(String department, Integer student) {
+    public AddStudentAction(String department, String student) {
         this.department = department;
         this.student = student;
         setActionName("Add Student");
@@ -16,7 +16,7 @@ public class AddStudentAction extends Action<String> {
         return department;
     }
 
-    public Integer getStudent() {
+    public String getStudent() {
         return student;
     }
 

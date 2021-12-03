@@ -5,11 +5,11 @@ import bgu.atd.a1.sim.Computer;
 
 public class AdministrativeCheckAction extends Action<String> {
     String department;
-    Integer[] students;
+    String[] students;
     String computerType;
     String[] conditions;
 
-    public AdministrativeCheckAction(String department, Integer[] students, String computerType, String[] conditions) {
+    public AdministrativeCheckAction(String department, String[] students, String computerType, String[] conditions) {
         this.department = department;
         this.students = students;
         this.computerType = computerType;
@@ -20,7 +20,7 @@ public class AdministrativeCheckAction extends Action<String> {
         return department;
     }
 
-    public Integer[] getStudents() {
+    public String[] getStudents() {
         return students;
     }
 

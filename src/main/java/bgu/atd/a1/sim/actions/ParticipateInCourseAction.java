@@ -4,18 +4,18 @@ import bgu.atd.a1.Action;
 
 public class ParticipateInCourseAction extends Action<String> {
 
-    Integer student;
+    String student;
     String course;
     Integer[] grades;
 
-    public ParticipateInCourseAction(Integer student, String course, Integer[] grades) {
+    public ParticipateInCourseAction(String student, String course, Integer[] grades) {
         this.student = student;
         this.course = course;
         this.grades = grades;
         setActionName("Participate In Course");
     }
 
-    public Integer getStudent() {
+    public String getStudent() {
         return student;
     }
 
