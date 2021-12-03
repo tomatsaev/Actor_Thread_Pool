@@ -24,26 +24,26 @@ public abstract class Action<R> {
     private PrivateState actorState;
     private callback callback;
 
-	/**
+    /**
      * start handling the action - note that this method is protected, a thread
      * cannot call it directly.
      */
     protected abstract void start();
-    
+
 
     /**
-    *
-    * start/continue handling the action
-    *
-    * this method should be called in order to start this action
-    * or continue its execution in the case where it has been already started.
-    *
-    * IMPORTANT: this method is package protected, i.e., only classes inside
-    * the same package can access it - you should *not* change it to
-    * public/private/protected
-    *
-    */
-   /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
+     *
+     * start/continue handling the action
+     *
+     * this method should be called in order to start this action
+     * or continue its execution in the case where it has been already started.
+     *
+     * IMPORTANT: this method is package protected, i.e., only classes inside
+     * the same package can access it - you should *not* change it to
+     * public/private/protected
+     *
+     */
+    /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
         if(!started && !this.promise.isResolved()) {
             this.started = true;
             this.pool = pool;
@@ -55,13 +55,13 @@ public abstract class Action<R> {
             callback.call();
         }
 
-   }
-    
-    
+    }
+
+
     /**
      * add a callback to be executed once *all* the given actions results are
      * resolved
-     * 
+     *
      * Implementors note: make sure that the callback is running only once when
      * all the given actions completed.
      *
@@ -93,40 +93,40 @@ public abstract class Action<R> {
                 pool.submit(parent, parent.actorID, parent.actorState);
         }
     }
-    
+
     /**
      * @return action's promise (result)
      */
     public final Promise<R> getResult() {
-    	return this.promise;
+        return this.promise;
     }
-    
+
     /**
      * send an action to an other actor
-     * 
+     *
      * @param action
      * 				the action
      * @param actorId
      * 				actor's id
      * @param actorState
-	 * 				actor's private state (actor's information)
+     * 				actor's private state (actor's information)
      */
-	public void sendMessage(Action<?> action, String actorId, PrivateState actorState){
+    public void sendMessage(Action<?> action, String actorId, PrivateState actorState){
         pool.submit(action, actorId, actorState);
-	}
-	
-	/**
-	 * set action's name
-	 * @param actionName
-	 */
-	public void setActionName(String actionName){
+    }
+
+    /**
+     * set action's name
+     * @param actionName
+     */
+    public void setActionName(String actionName){
         this.promise.setActionName(actionName);
-	}
-	
-	/**
-	 * @return action's name
-	 */
-	public String getActionName(){
+    }
+
+    /**
+     * @return action's name
+     */
+    public String getActionName(){
         return this.promise.getActionName();
-	}
+    }
 }
