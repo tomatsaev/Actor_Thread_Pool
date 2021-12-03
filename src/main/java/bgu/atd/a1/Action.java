@@ -2,6 +2,7 @@ package bgu.atd.a1;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 /**
  * an abstract class that represents an action that may be executed using the
@@ -16,9 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class Action<R> {
 
-    private Promise<R> promise = new Promise<>();
+    private final Promise<R> promise = new Promise<>();
     private ActorThreadPool pool;
-    private AtomicInteger dependenciesCounter = new AtomicInteger(0);
+    private final AtomicInteger dependenciesCounter = new AtomicInteger(0);
     private String actorID;
     private Boolean started = false;
     private PrivateState actorState;
@@ -44,14 +45,14 @@ public abstract class Action<R> {
      *
      */
     /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
-        if(!started && !this.promise.isResolved()) {
+        if (!started && !this.promise.isResolved()) {
             this.started = true;
             this.pool = pool;
             this.actorID = actorId;
             this.actorState = actorState;
             start();
         }
-        else{
+        else {
             callback.call();
         }
 
@@ -65,7 +66,7 @@ public abstract class Action<R> {
      * Implementors note: make sure that the callback is running only once when
      * all the given actions completed.
      *
-     * @param actions
+     * @param actions - actions
      * @param callback the callback to execute once all the results are resolved
      */
     protected final void then(Collection<? extends Action<?>> actions, callback callback) {
@@ -90,6 +91,7 @@ public abstract class Action<R> {
      * @param result - the action calculated result
      */
     protected final void complete(R result) {
+        Stream.of(this.actorState.getLogger()).forEach(System.out::println);
         this.promise.resolve(result);
     }
 
@@ -116,7 +118,7 @@ public abstract class Action<R> {
 
     /**
      * set action's name
-     * @param actionName
+     * @param actionName - action name
      */
     public void setActionName(String actionName){
         this.promise.setActionName(actionName);
