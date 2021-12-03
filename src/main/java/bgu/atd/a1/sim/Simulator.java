@@ -7,16 +7,14 @@ package bgu.atd.a1.sim;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.ActorThreadPool;
 import bgu.atd.a1.PrivateState;
-import bgu.atd.a1.sim.actions.OpenCourseAction;
+import bgu.atd.a1.sim.actions.*;
 import com.google.gson.*;
 
 /**
@@ -113,10 +111,71 @@ public class Simulator {
                 String[] prerequisites = new String[prerequisitesJsonArray.size()];
                 for(int i = 0; i< prerequisitesJsonArray.size(); i++){
                     prerequisites[i] = prerequisitesJsonArray.get(i).getAsString();
-                    System.out.println(prerequisites[i]);
-
                 }
                 action = new OpenCourseAction(department, course, space, prerequisites);
+                break;
+
+            case "Add Student":
+                department = actionObject.get("Department").getAsString();
+                Integer student = actionObject.get("Student").getAsInt();
+                action = new AddStudentAction(department, student);
+                break;
+
+            case "Participate In Course":
+                student = actionObject.get("Student").getAsInt();
+                course = actionObject.get("Course").getAsString();
+                JsonArray gradesJsonArray = actionObject.get("Prerequisites").getAsJsonArray();
+                Integer[] grades = new Integer[gradesJsonArray.size()];
+                for(int i = 0; i< gradesJsonArray.size(); i++){
+                    grades[i] = gradesJsonArray.get(i).getAsInt();
+                }
+                action = new ParticipateInCourseAction(student, course, grades);
+                break;
+
+            case "Unregister":
+                student = actionObject.get("Student").getAsInt();
+                course = actionObject.get("Course").getAsString();
+                action = new UnregisterAction(student, course);
+                break;
+
+            case "Close Course":
+                department = actionObject.get("Department").getAsString();
+                course = actionObject.get("Course").getAsString();
+                action = new CloseCourseAction(department, course);
+                break;
+
+            case "Add Spaces":
+                course = actionObject.get("Course").getAsString();
+                Integer number = actionObject.get("Number").getAsInt();
+                action = new AddSpacesAction(course, number);
+                break;
+
+            case "Administrative Check":
+                department = actionObject.get("Department").getAsString();
+                JsonArray studentsJsonArray = actionObject.get("Students").getAsJsonArray();
+                Integer[] students = new Integer[studentsJsonArray.size()];
+                for(int i = 0; i< studentsJsonArray.size(); i++){
+                    students[i] = studentsJsonArray.get(i).getAsInt();
+                }
+                String computerType = actionObject.get("Computer").getAsString();
+                JsonArray conditionsJsonArray = actionObject.get("Conditions").getAsJsonArray();
+                String[] conditions = new String[conditionsJsonArray.size()];
+                for(int i = 0; i< conditionsJsonArray.size(); i++){
+                    conditions[i] = conditionsJsonArray.get(i).getAsString();
+                }
+                action = new AdministrativeCheckAction(department, students, computerType, conditions);
+                break;
+
+            case "Register With Preferences":
+                student = actionObject.get("Student").getAsInt();
+                JsonArray coursesJsonArray = actionObject.get("Conditions").getAsJsonArray();
+                String[] courses = new String[coursesJsonArray.size()];
+                for(int i = 0; i< coursesJsonArray.size(); i++){
+                    courses[i] = coursesJsonArray.get(i).getAsString();
+                }
+                action = new RegisterWithPreferanceAction(student, courses);
+                break;
+
         }
         return action;
     }

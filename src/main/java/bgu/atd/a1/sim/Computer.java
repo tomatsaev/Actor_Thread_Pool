@@ -10,9 +10,9 @@ public class Computer {
 	long successSig;
 	
 	public Computer(String computerType, long successSig, long failSig) {
+		this.computerType = computerType;
 		this.failSig = failSig;
 		this.successSig = successSig;
-		this.computerType = computerType;
 	}
 	
 	/**

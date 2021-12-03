@@ -2,7 +2,7 @@ package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
 
-public class OpenCourseAction extends Action {
+public class OpenCourseAction extends Action<String> {
 
     String department;
     String course;
@@ -15,22 +15,6 @@ public class OpenCourseAction extends Action {
         this.space = space;
         this.prerequisites = prerequisites;
         setActionName("Open Course");
-    }
-
-    public void setDepartment(String department) {
-        department = department;
-    }
-
-    public void setCourse(String course) {
-        course = course;
-    }
-
-    public void setspace(String space) {
-        space = space;
-    }
-
-    public void setPrerequisites(String[] prerequisites) {
-        prerequisites = prerequisites;
     }
 
     public String[] getPrerequisites() {
