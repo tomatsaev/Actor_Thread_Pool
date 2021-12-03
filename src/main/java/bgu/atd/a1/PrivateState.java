@@ -1,5 +1,6 @@
 package bgu.atd.a1;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
 public abstract class PrivateState {
 	
 	// holds the actions' name what were executed
-	private List<String> history;
+	private final List<String> history = new ArrayList<>();
 
 	public List<String> getLogger(){
 		return history;
@@ -19,9 +20,10 @@ public abstract class PrivateState {
 	/**
 	 * add an action to the records
 	 *  
-	 * @param actionName
+	 * @param actionName - action name
 	 */
 	public void addRecord(String actionName){
+		System.out.println("added " + actionName);
 		history.add(actionName);
 	}
 	

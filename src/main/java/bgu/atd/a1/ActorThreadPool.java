@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 
 /**
  * represents an actor thread pool - to understand what this class does please
@@ -21,12 +23,13 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ActorThreadPool {
 
-	private Integer nthreads;
+	private final Integer nthreads;
+	private final AtomicInteger currentActions = new AtomicInteger(0);
 	protected Boolean terminate = false;
 	List<Thread> threads = new LinkedList<>();
-	private Map<String, PrivateState> actors = new ConcurrentHashMap<>();
-	private Map<String, Lock> locksByID = new ConcurrentHashMap<>();
-	private Map<String, Queue<Action>> actionsByActorID = new ConcurrentHashMap<>();
+	private final Map<String, PrivateState> actors = new ConcurrentHashMap<>();
+	private final Map<String, Lock> locksByID = new ConcurrentHashMap<>();
+	private final Map<String, Queue<Action<?>>> actionsByActorID = new ConcurrentHashMap<>();
 
 	/**
 	 * creates a {@link ActorThreadPool} which has nthreads. Note, threads
@@ -75,7 +78,12 @@ public class ActorThreadPool {
 		actionsByActorID.putIfAbsent(actorId, new ConcurrentLinkedQueue<>());
 		locksByID.putIfAbsent(actorId, new ReentrantLock());
 
+//		currentActions is decremented last (added again), so the program shuts down gracefully
+		action.getResult().subscribe(() ->
+				action.getResult().subscribe(currentActions::decrementAndGet));
+
 		actionsByActorID.get(actorId).add(action);
+		currentActions.incrementAndGet();
 	}
 
 	/**
@@ -89,10 +97,12 @@ public class ActorThreadPool {
 	 */
 	public void shutdown() throws InterruptedException {
 		terminate = true;
+		while (currentActions.get() != 0) {
+			Thread.sleep(1000);
+		}
 		for (Thread thread: threads) {
 			thread.interrupt();
 		}
-		// TODO: replace method body with real implementation
 	}
 
 	/**
@@ -112,7 +122,7 @@ public class ActorThreadPool {
 			while (!terminate) {
 				for (String actor : locksByID.keySet()) {
 					if (locksByID.get(actor).tryLock()) {
-						Action currAction = actionsByActorID.get(actor).poll();
+						Action<?> currAction = actionsByActorID.get(actor).poll();
 						if(currAction != null){
 							currAction.handle(this, actor, actors.get(actor));
 						}
@@ -123,6 +133,7 @@ public class ActorThreadPool {
 		}
 		catch (Exception e){
 			System.out.println("Exception caught");
+			e.printStackTrace();
 		}
 
 	}

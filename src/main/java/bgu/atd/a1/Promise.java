@@ -1,6 +1,7 @@
 package bgu.atd.a1;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * this class represents a deferred result i.e., an object that eventually will
@@ -19,8 +20,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class Promise<T>{
 
-	private Boolean isResolved = false;
-	private ConcurrentLinkedQueue<callback> callbacks;
+	private final AtomicBoolean isResolved = new AtomicBoolean(false);
+	private final AtomicBoolean resolving = new AtomicBoolean(false);
+	private final ConcurrentLinkedQueue<callback> callbacks = new ConcurrentLinkedQueue<>();
 	private T value;
 	private String actionName;
 
@@ -43,7 +45,7 @@ public class Promise<T>{
 
     /**
      *
-     * @param actionName
+     * @param actionName - action name
      *
      */
 	/*package*/ final void setActionName(String actionName){
@@ -64,7 +66,7 @@ public class Promise<T>{
 	 *         {@link #resolve(java.lang.Object)} has been called on this object
 	 *         before.
 	 */
-	public boolean isResolved() { return isResolved; }
+	public boolean isResolved() { return isResolved.get(); }
 
 
 	/**
@@ -81,16 +83,17 @@ public class Promise<T>{
 	 *            - the value to resolve this promise object with
 	 */
 	public void resolve(T value){
-		if(isResolved()){
+		if (!resolving.compareAndSet(false, true) || isResolved())
 			throw new IllegalStateException("Promise already resolved");
-		}
-		isResolved = true;
+
+		isResolved.set(true);
 
 		this.value = value;
 
 		while(callbacks.peek() != null){
 			callbacks.poll().call();
 		}
+		resolving.set(false);
 	}
 
 	/**
@@ -107,7 +110,7 @@ public class Promise<T>{
 	 *            the callback to be called when the promise object is resolved
 	 */
 	public void subscribe(callback callback) {
-		if(isResolved){
+		if(isResolved.get() && !resolving.get()){
 			callback.call();
 		}
 		else{
