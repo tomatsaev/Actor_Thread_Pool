@@ -1,4 +1,4 @@
-package bgu.atd.a1.sim.messages;
+package bgu.atd.a1.sim.actions.messages;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;
@@ -24,8 +24,8 @@ public class CloseCourseMessage extends Action<Boolean> {
             actions.add(removeGrade);
         }
         then(actions, () -> {
-            complete(true);
             coursePrivateState.addRecord(getActionName());
+            complete(true);
         });
         for (int i = 0; i < actions.size(); i++) {
             sendMessage(actions.get(i), coursePrivateState.getRegStudents().get(i), new StudentPrivateState());

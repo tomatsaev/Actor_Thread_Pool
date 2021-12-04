@@ -1,7 +1,7 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
-import bgu.atd.a1.sim.messages.CloseCourseMessage;
+import bgu.atd.a1.sim.actions.messages.CloseCourseMessage;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 

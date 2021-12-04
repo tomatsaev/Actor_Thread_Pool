@@ -5,9 +5,7 @@
  */
 package bgu.atd.a1.sim;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -41,25 +39,26 @@ public class Simulator {
      */
     public static void start() {
         try {
-            CountDownLatch phase1Cowntdown = new CountDownLatch(phase1Actions.size());
-            CountDownLatch phase2Cowntdown = new CountDownLatch(phase2Actions.size());
-            CountDownLatch phase3Cowntdown = new CountDownLatch(phase3Actions.size());
+            CountDownLatch phase1Countdown = new CountDownLatch(phase1Actions.size());
+            CountDownLatch phase2Countdown = new CountDownLatch(phase2Actions.size());
+            CountDownLatch phase3Countdown = new CountDownLatch(phase3Actions.size());
 
             for (Action action : phase1Actions.keySet()) {
                 actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
-                action.getResult().subscribe(phase1Cowntdown::countDown);
+                action.getResult().subscribe(phase1Countdown::countDown);
             }
-            phase1Cowntdown.await();
+            phase1Countdown.await();
             for (Action action : phase2Actions.keySet()) {
                 actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
-                action.getResult().subscribe(phase2Cowntdown::countDown);
+                action.getResult().subscribe(phase2Countdown::countDown);
             }
-            phase2Cowntdown.await();
+            phase2Countdown.await();
             for (Action action : phase3Actions.keySet()) {
                 actorThreadPool.submit(action, phase3Actions.get(action).getKey(), phase3Actions.get(action).getValue());
-                action.getResult().subscribe(phase3Cowntdown::countDown);
+                action.getResult().subscribe(phase3Countdown::countDown);
             }
-            phase3Cowntdown.await();
+            phase3Countdown.await();
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -85,11 +84,7 @@ public class Simulator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Map<String,PrivateState> simulationResult = actorThreadPool.getActors();
-
         return (HashMap<String,PrivateState>)actorThreadPool.getActors();
-
-
     }
 
 

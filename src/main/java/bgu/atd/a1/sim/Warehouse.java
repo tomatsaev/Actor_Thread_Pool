@@ -31,10 +31,11 @@ public class Warehouse {
         return null;
     }
 
-    public void acquire(String computerType){
+    public boolean acquire(String computerType){
         Computer computer = getComputer(computerType);
         if(computer != null)
-            computerMap.get(computer).lock();
+            return computerMap.get(computer).tryLock();
+        return false;
     }
 
     public void release(String computerType){
