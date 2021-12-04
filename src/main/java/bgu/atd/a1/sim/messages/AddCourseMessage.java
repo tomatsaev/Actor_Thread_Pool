@@ -1,16 +1,16 @@
-package bgu.atd.a1.sim.massages;
+package bgu.atd.a1.sim.messages;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 
 import java.util.List;
 
-public class AddCourseMassage extends Action<Boolean> {
+public class AddCourseMessage extends Action<Boolean> {
 
     Integer space;
     List<String> prerequisites;
 
-    public AddCourseMassage(Integer space, List<String> prerequisites) {
+    public AddCourseMessage(Integer space, List<String> prerequisites) {
         this.space = space;
         this.prerequisites = prerequisites;
         setActionName("Add Course Massage");

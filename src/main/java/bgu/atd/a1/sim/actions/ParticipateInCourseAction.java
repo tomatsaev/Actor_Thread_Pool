@@ -1,8 +1,7 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
-import bgu.atd.a1.sim.massages.AddCourseMassage;
-import bgu.atd.a1.sim.massages.ParticipateMassage;
+import bgu.atd.a1.sim.messages.ParticipateMessage;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
@@ -13,9 +12,9 @@ public class ParticipateInCourseAction extends Action<String> {
 
     String student;
     String course;
-    Integer[] grades;
+    String[] grades;
 
-    public ParticipateInCourseAction(String student, String course, Integer[] grades) {
+    public ParticipateInCourseAction(String student, String course, String[] grades) {
         this.student = student;
         this.course = course;
         this.grades = grades;
@@ -30,7 +29,7 @@ public class ParticipateInCourseAction extends Action<String> {
         return course;
     }
 
-    public Integer[] getGrades() {
+    public String[] getGrades() {
         return grades;
     }
 
@@ -39,15 +38,14 @@ public class ParticipateInCourseAction extends Action<String> {
         CoursePrivateState coursePrivateState = (CoursePrivateState) pool.getPrivateState(actorID);
         if(coursePrivateState.getAvailableSpots() > 0) {
             List<Action<Boolean>> actions = new ArrayList<>();
-            Action participateMassage = new ParticipateMassage(student);
+            Action participateMassage = new ParticipateMessage(student, course, grades);
             actions.add(participateMassage);
             then(actions, () -> {
-                if (actions.get(0).getResult().get()) {
-                    complete("Student " + student + " is participating course " + course + " successfully.");
-                    coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() - 1);
-                    coursePrivateState.addRecord(getActionName());
-                } else
-                    complete("Failed to add student " + student + " to participate course " + course + ".");
+                coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() - 1);
+                complete("Student " + student + " is participating course " + course + " successfully.");
+                coursePrivateState.addRecord(getActionName());
+//                 else
+//                    complete("Failed to add student " + student + " to participate course " + course + ".");
             });
             sendMessage(participateMassage, course, new StudentPrivateState());
         }

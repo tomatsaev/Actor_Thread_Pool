@@ -1,7 +1,7 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
-import bgu.atd.a1.sim.massages.AddCourseMassage;
+import bgu.atd.a1.sim.messages.AddCourseMessage;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 
@@ -41,7 +41,7 @@ public class OpenCourseAction extends Action<String> {
 
     public void start() {
         List<Action<Boolean>> actions = new ArrayList<>();
-        Action addCourse = new AddCourseMassage(space, prerequisites);
+        Action addCourse = new AddCourseMessage(space, prerequisites);
         actions.add(addCourse);
         then(actions, ()->{
             if(actions.get(0).getResult().get()) {

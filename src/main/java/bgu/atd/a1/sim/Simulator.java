@@ -173,9 +173,9 @@ public class Simulator {
                 student = actionObject.get("Student").getAsString();
                 course = actionObject.get("Course").getAsString();
                 JsonArray gradesJsonArray = actionObject.get("Grade").getAsJsonArray();
-                Integer[] grades = new Integer[gradesJsonArray.size()];
+                String[] grades = new String[gradesJsonArray.size()];
                 for(int i = 0; i< gradesJsonArray.size(); i++){
-                    grades[i] = gradesJsonArray.get(i).getAsInt();
+                    grades[i] = gradesJsonArray.get(i).getAsString();
                 }
                 action = new ParticipateInCourseAction(student, course, grades);
                 actorID = course;

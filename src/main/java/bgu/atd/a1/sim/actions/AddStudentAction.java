@@ -23,10 +23,10 @@ public class AddStudentAction extends Action<String> {
 
     @Override
     protected void start() {
-        complete("Student " + student + " was added to " + department + " department successfully");
         DepartmentPrivateState privateState = (DepartmentPrivateState) pool.getPrivateState(actorID);
         privateState.addRecord(getActionName());
         privateState.getStudentList().add(student);
+        complete("Student " + student + " was added to " + department + " department successfully");
     }
 }
 
