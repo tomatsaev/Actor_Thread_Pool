@@ -13,7 +13,7 @@ public class AddCourseMessage extends Action<Boolean> {
     public AddCourseMessage(Integer space, List<String> prerequisites) {
         this.space = space;
         this.prerequisites = prerequisites;
-        setActionName("Add Course Massage");
+        setActionName("Add Course Message");
     }
 
     @Override

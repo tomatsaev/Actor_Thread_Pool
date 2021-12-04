@@ -8,7 +8,7 @@ public class UnregisterMessage extends Action<Boolean> {
 
     public UnregisterMessage(String course) {
         this.course = course;
-        setActionName("Unregister Massage");
+        setActionName("Unregister Message");
     }
 
     @Override

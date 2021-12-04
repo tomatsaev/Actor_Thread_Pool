@@ -38,8 +38,8 @@ public class ParticipateInCourseAction extends Action<String> {
         CoursePrivateState coursePrivateState = (CoursePrivateState) pool.getPrivateState(actorID);
         if(coursePrivateState.getAvailableSpots() > 0) {
             List<Action<Boolean>> actions = new ArrayList<>();
-            Action participateMassage = new ParticipateMessage(student, course, grades);
-            actions.add(participateMassage);
+            Action<Boolean> participateMessage = new ParticipateMessage(student, course, grades);
+            actions.add(participateMessage);
             then(actions, () -> {
                 coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() - 1);
                 complete("Student " + student + " is participating course " + course + " successfully.");
@@ -47,7 +47,7 @@ public class ParticipateInCourseAction extends Action<String> {
 //                 else
 //                    complete("Failed to add student " + student + " to participate course " + course + ".");
             });
-            sendMessage(participateMassage, course, new StudentPrivateState());
+            sendMessage(participateMessage, course, new StudentPrivateState());
         }
         else{
             complete("No room available for Student " + student + " to participate course " + course + ".");
