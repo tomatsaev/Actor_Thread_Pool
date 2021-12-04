@@ -4,9 +4,7 @@
  * and open the template in the editor.
  */
 package bgu.atd.a1.sim;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.*;
 
 import bgu.atd.a1.Action;
@@ -69,7 +67,10 @@ public class Simulator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return (HashMap)actorThreadPool.getActors();
+        Map<String,PrivateState> simulationResult = actorThreadPool.getActors();
+
+        return (HashMap<String,PrivateState>)actorThreadPool.getActors();
+
     }
 	
 	
@@ -78,8 +79,16 @@ public class Simulator {
         attachActorThreadPool(new ActorThreadPool(nthreads));
         actorThreadPool.start();
         start();
-        end();
-	}
+        Map<String, PrivateState> simulationResult;
+        simulationResult = end();
+        try {
+            FileOutputStream out = new FileOutputStream("result.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(out);
+            oos.writeObject(simulationResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 	private static void parse(String s){
 		File input = new File(s);
