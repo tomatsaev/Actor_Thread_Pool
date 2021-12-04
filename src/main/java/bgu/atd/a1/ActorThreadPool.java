@@ -23,7 +23,9 @@ public class ActorThreadPool {
 	private final Integer nthreads;
 	private final AtomicInteger currentActions = new AtomicInteger(0);
 	protected Boolean terminate = false;
-	List<Thread> threads = new LinkedList<>();
+	private final List<Thread> activeThreads = new ArrayList<>();
+	private final List<Thread> sleepingThreads = new ArrayList<>();
+	private final Lock threadsLock  = new ReentrantLock();
 	private final HashMap<String, PrivateState> actors = new HashMap<>();
 	private final Map<String, Lock> locksByID = new ConcurrentHashMap<>();
 	private final Map<String, Queue<Action<?>>> actionsByActorID = new ConcurrentHashMap<>();
@@ -71,16 +73,31 @@ public class ActorThreadPool {
 	 * @param actorState actor's private state (actor's information)
 	 */
 	public void submit(Action<?> action, String actorId, PrivateState actorState) {
+		if (terminate)
+			return;
 		actors.putIfAbsent(actorId, actorState);
 		actionsByActorID.putIfAbsent(actorId, new ConcurrentLinkedQueue<>());
 		locksByID.putIfAbsent(actorId, new ReentrantLock());
 
 //		currentActions is decremented last (added again), so the program shuts down gracefully
 		action.getResult().subscribe(() ->
-				action.getResult().subscribe(currentActions::decrementAndGet));
+				action.getResult().subscribe(() -> {
+					currentActions.decrementAndGet();
+					System.out.println("promise: Number of actions after decrement: " + currentActions.get());
+				}));
 
 		actionsByActorID.get(actorId).add(action);
 		currentActions.incrementAndGet();
+		System.out.println("submit: Number of actions after increment: " + currentActions.get());
+
+		threadsLock.lock();
+		if (activeThreads.size() < nthreads && activeThreads.size() < actionsByActorID.keySet().size()) {
+			Thread worker = sleepingThreads.remove(0);
+			worker.start();
+			activeThreads.add(worker);
+		}
+		threadsLock.unlock();
+
 	}
 
 	/**
@@ -94,13 +111,15 @@ public class ActorThreadPool {
 	 */
 	public void shutdown() throws InterruptedException {
 		terminate = true;
+		System.out.println("shutdown: Number of actions after shutdown: " + currentActions.get());
 		while (currentActions.get() != 0) {
 			Thread.sleep(1000);
 		}
-		for (Thread thread: threads) {
-			thread.join();
-// TODO: check thread.join vs thread.interrupt
+		for (Thread thread: activeThreads) {
+			thread.interrupt();
+			System.out.println("shutdown: found an active thread: " + thread.getName());
 		}
+		System.exit(0);
 	}
 
 	/**
@@ -110,13 +129,22 @@ public class ActorThreadPool {
 		for (int i = 0; i < nthreads; i++) {
 			Thread worker = new Thread(this::task);
 			worker.setName("Worker " + (i));
-			threads.add(worker);
-			worker.start();
+			sleepingThreads.add(worker);
 		}
+
 	}
 
 	private void task(){
-        while (!terminate) {
+        while (true) {
+			threadsLock.lock();
+			if (activeThreads.size() > actionsByActorID.keySet().size()) {
+				System.out.println("task: found self " + activeThreads.remove(Thread.currentThread()));
+				activeThreads.remove(Thread.currentThread());
+				sleepingThreads.add(Thread.currentThread());
+				threadsLock.unlock();
+				Thread.currentThread().interrupt();
+			} else
+				threadsLock.unlock();
             for (String actor : locksByID.keySet()) {
                 try {
                     if (locksByID.get(actor).tryLock()) {
