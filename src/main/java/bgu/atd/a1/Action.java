@@ -52,8 +52,11 @@ public abstract class Action<R> {
             this.actorState = actorState;
             start();
         }
-        else {
+        else if(callback != null){
             callback.call();
+        }
+        else{
+            System.out.println("callback is null in actorID "  + actorId);
         }
 
     }

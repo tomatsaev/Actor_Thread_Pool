@@ -1,6 +1,11 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
+import bgu.atd.a1.sim.massages.AddCourseMassage;
+import bgu.atd.a1.sim.privateStates.CoursePrivateState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OpenCourseAction extends Action<String> {
 
@@ -21,11 +26,11 @@ public class OpenCourseAction extends Action<String> {
         return prerequisites;
     }
 
-    public Integer getspace() {
+    public Integer getSpace() {
         return space;
     }
 
-    public String getcourse() {
+    public String getCourse() {
         return course;
     }
 
@@ -33,7 +38,18 @@ public class OpenCourseAction extends Action<String> {
         return department;
     }
 
-    public void start(){
+    public void start() {
+        List<Action<Boolean>> actions = new ArrayList<>();
+        Action addCourse = new AddCourseMassage(space, prerequisites);
+        actions.add(addCourse);
+        then(actions, ()->{
+            if(actions.get(0).getResult().get()) {
+                complete("Course " + course + " was added to " + department + " department successfully");
 
+            }
+            else
+                complete("Course " + course + " was NOT added to " + department + " department");
+        });
+        sendMessage(addCourse, course, new CoursePrivateState());
     }
 }

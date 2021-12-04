@@ -1,9 +1,6 @@
 package bgu.atd.a1;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,7 +24,7 @@ public class ActorThreadPool {
 	private final AtomicInteger currentActions = new AtomicInteger(0);
 	protected Boolean terminate = false;
 	List<Thread> threads = new LinkedList<>();
-	private final Map<String, PrivateState> actors = new ConcurrentHashMap<>();
+	private final HashMap<String, PrivateState> actors = new HashMap<>();
 	private final Map<String, Lock> locksByID = new ConcurrentHashMap<>();
 	private final Map<String, Queue<Action<?>>> actionsByActorID = new ConcurrentHashMap<>();
 
@@ -101,7 +98,7 @@ public class ActorThreadPool {
 			Thread.sleep(1000);
 		}
 		for (Thread thread: threads) {
-			thread.interrupt();
+			thread.join();
 // TODO: check thread.join vs thread.interrupt
 		}
 	}
@@ -130,8 +127,8 @@ public class ActorThreadPool {
                         locksByID.get(actor).unlock();
                     }
                 } catch (Exception e) {
-                    System.out.println("Exception caught");
-                }
+					e.printStackTrace();
+				}
             }
         }
     }

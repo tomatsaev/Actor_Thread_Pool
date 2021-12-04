@@ -19,7 +19,6 @@ public class DepartmentPrivateState extends PrivateState{
 	 */
 	public DepartmentPrivateState() {
 		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
 	public List<String> getCourseList() {
