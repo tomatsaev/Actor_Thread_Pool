@@ -18,9 +18,9 @@ import java.util.stream.Stream;
 public abstract class Action<R> {
 
     private final Promise<R> promise = new Promise<>();
-    private ActorThreadPool pool;
+    protected ActorThreadPool pool;
     private final AtomicInteger dependenciesCounter = new AtomicInteger(0);
-    private String actorID;
+    protected String actorID;
     private Boolean started = false;
     private PrivateState actorState;
     private callback callback;

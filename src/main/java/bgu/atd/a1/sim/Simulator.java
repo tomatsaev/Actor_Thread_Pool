@@ -7,10 +7,7 @@ package bgu.atd.a1.sim;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.ActorThreadPool;
@@ -155,9 +152,9 @@ public class Simulator {
                 String course = actionObject.get("Course").getAsString();
                 Integer space = actionObject.get("Space").getAsInt();
                 JsonArray prerequisitesJsonArray = actionObject.get("Prerequisites").getAsJsonArray();
-                String[] prerequisites = new String[prerequisitesJsonArray.size()];
+                List<String> prerequisites = new LinkedList<>();
                 for(int i = 0; i< prerequisitesJsonArray.size(); i++){
-                    prerequisites[i] = prerequisitesJsonArray.get(i).getAsString();
+                    prerequisites.add(prerequisitesJsonArray.get(i).getAsString());
                 }
                 action = new OpenCourseAction(department, course, space, prerequisites);
                 actorID = department;

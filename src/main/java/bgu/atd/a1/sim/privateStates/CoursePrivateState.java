@@ -13,11 +13,11 @@ public class CoursePrivateState extends PrivateState{
 	private Integer availableSpots;
 	private Integer registered;
 	private List<String> regStudents;
-	private List<String> prequisites;
+	private List<String> prerequisites;
 	
 	/**
  	 * Implementors note: you may not add other constructors to this class nor
-	 * you allowed to add any other parameter to this constructor - changing
+	 * allowed to add any other parameter to this constructor - changing
 	 * this may cause automatic tests to fail..
 	 */
 	public CoursePrivateState() {
@@ -36,7 +36,23 @@ public class CoursePrivateState extends PrivateState{
 		return regStudents;
 	}
 
-	public List<String> getPrequisites() {
-		return prequisites;
+	public List<String> getPrerequisites() {
+		return prerequisites;
+	}
+
+	public void setAvailableSpots(Integer availableSpots) {
+		this.availableSpots = availableSpots;
+	}
+
+	public void setRegistered(Integer registered) {
+		this.registered = registered;
+	}
+
+	public void setRegStudents(List<String> regStudents) {
+		this.regStudents = regStudents;
+	}
+
+	public void setPrerequisites(List<String> prerequisites) {
+		this.prerequisites = prerequisites;
 	}
 }

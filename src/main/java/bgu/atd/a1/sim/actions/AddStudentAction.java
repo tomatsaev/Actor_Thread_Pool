@@ -1,6 +1,7 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
+import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 
 public class AddStudentAction extends Action<String> {
     String department;
@@ -22,6 +23,10 @@ public class AddStudentAction extends Action<String> {
 
     @Override
     protected void start() {
-
+        complete("Student " + student + " was added to " + department + " department successfully");
+        DepartmentPrivateState privateState = (DepartmentPrivateState) pool.getPrivateState(actorID);
+        privateState.addRecord(getActionName());
+        privateState.getStudentList().add(student);
     }
 }
+

@@ -1,5 +1,7 @@
 package bgu.atd.a1.sim.privateStates;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -18,15 +20,21 @@ public class DepartmentPrivateState extends PrivateState{
 	 * this may cause automatic tests to fail..
 	 */
 	public DepartmentPrivateState() {
-		//TODO: replace method body with real implementation
+		courseList = new LinkedList<>();
+		studentList = new LinkedList<>();
 	}
 
 	public List<String> getCourseList() {
 		return courseList;
 	}
 
-	public List<String> getStudentList() {
-		return studentList;
+	public List<String> getStudentList() { return studentList; }
+
+	public void setCourseList(List<String> courseList) {
+		this.courseList = courseList;
 	}
-	
+
+	public void setStudentList(List<String> studentList) {
+		this.studentList = studentList;
+	}
 }
