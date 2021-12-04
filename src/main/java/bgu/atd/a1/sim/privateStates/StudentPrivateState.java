@@ -20,7 +20,6 @@ public class StudentPrivateState extends PrivateState{
 	 */
 	public StudentPrivateState() {
 		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
 	public HashMap<String, Integer> getGrades() {

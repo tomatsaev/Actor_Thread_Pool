@@ -39,8 +39,18 @@ public class Simulator {
 	* Begin the simulation Should not be called before attachActorThreadPool()
 	*/
     public static void start(){
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+        // TODO: check inserting by order (phases)
+        for(Action action : phase1Actions.keySet()) {
+            actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
+        }
+
+        for(Action action : phase2Actions.keySet()) {
+            actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
+        }
+
+        for(Action action : phase2Actions.keySet()) {
+            actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
+        }
     }
 	
 	/**
@@ -57,30 +67,21 @@ public class Simulator {
 	* returns list of private states
 	*/
 	public static HashMap<String,PrivateState> end(){
-		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
-	}
+        try {
+            actorThreadPool.shutdown();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return (HashMap)actorThreadPool.getActors();
+    }
 	
 	
 	public static void main(String [] args){
 		parse(args[0]);
-        actorThreadPool = new ActorThreadPool(nthreads);
+        attachActorThreadPool(new ActorThreadPool(nthreads));
         actorThreadPool.start();
-        System.out.println(phase1Actions.keySet());
-
-        // TODO: check inserting by order (phases)
-        for(Action action : phase1Actions.keySet()) {
-            actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
-        }
-
-        for(Action action : phase2Actions.keySet()) {
-            actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
-        }
-
-        for(Action action : phase2Actions.keySet()) {
-            actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
-        }
-
+        start();
+        end();
 	}
 
 	private static void parse(String s){

@@ -22,7 +22,6 @@ public class CoursePrivateState extends PrivateState{
 	 */
 	public CoursePrivateState() {
 		//TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
 	public Integer getAvailableSpots() {
