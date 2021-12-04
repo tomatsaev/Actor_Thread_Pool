@@ -86,9 +86,8 @@ public class Promise<T>{
 		if (!resolving.compareAndSet(false, true) || isResolved())
 			throw new IllegalStateException("Promise already resolved");
 
-		isResolved.set(true);
-
 		this.value = value;
+		isResolved.set(true);
 
 		while(callbacks.peek() != null){
 			callbacks.poll().call();

@@ -21,7 +21,7 @@ import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 import com.google.gson.*;
 import javafx.util.Pair;
-
+// TODO: change pair to AbstractMap.simpleEntry
 /**
  * A class describing the simulator for part 2 of the assignment
  */
