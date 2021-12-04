@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.ActorThreadPool;
@@ -39,17 +40,29 @@ public class Simulator {
      * Begin the simulation Should not be called before attachActorThreadPool()
      */
     public static void start() {
-        // TODO: check inserting by order (phases)
-        for (Action action : phase1Actions.keySet()) {
-            actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
+        try {
+            CountDownLatch phase1Cowntdown = new CountDownLatch(phase1Actions.size());
+            CountDownLatch phase2Cowntdown = new CountDownLatch(phase2Actions.size());
+            CountDownLatch phase3Cowntdown = new CountDownLatch(phase3Actions.size());
+
+            for (Action action : phase1Actions.keySet()) {
+                actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
+                action.getResult().subscribe(phase1Cowntdown::countDown);
+            }
+            phase1Cowntdown.await();
+            for (Action action : phase2Actions.keySet()) {
+                actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
+                action.getResult().subscribe(phase2Cowntdown::countDown);
+            }
+            phase2Cowntdown.await();
+            for (Action action : phase3Actions.keySet()) {
+                actorThreadPool.submit(action, phase3Actions.get(action).getKey(), phase3Actions.get(action).getValue());
+                action.getResult().subscribe(phase3Cowntdown::countDown);
+            }
+            phase3Cowntdown.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        for (Action action : phase2Actions.keySet()) {
-            actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
-        }
-        for (Action action : phase3Actions.keySet()) {
-            actorThreadPool.submit(action, phase3Actions.get(action).getKey(), phase3Actions.get(action).getValue());
-        }
-        // TODO: countdownlatch
     }
 
     /**
