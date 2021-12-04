@@ -23,7 +23,7 @@ public abstract class PrivateState {
 	 * @param actionName - action name
 	 */
 	public void addRecord(String actionName){
-		System.out.println("added " + actionName);
+		System.out.println("addRecord: added " + actionName);
 		history.add(actionName);
 	}
 	

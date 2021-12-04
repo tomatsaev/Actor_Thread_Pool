@@ -85,7 +85,11 @@ public class Simulator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return (HashMap) actorThreadPool.getActors();
+        Map<String,PrivateState> simulationResult = actorThreadPool.getActors();
+
+        return (HashMap<String,PrivateState>)actorThreadPool.getActors();
+
+
     }
 
 
@@ -94,7 +98,16 @@ public class Simulator {
         attachActorThreadPool(new ActorThreadPool(nthreads));
         actorThreadPool.start();
         start();
-        end();
+        Map<String, PrivateState> simulationResult;
+        simulationResult = end();
+        try {
+            FileOutputStream out = new FileOutputStream("result.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(out);
+            oos.writeObject(simulationResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void parse(String s) {
