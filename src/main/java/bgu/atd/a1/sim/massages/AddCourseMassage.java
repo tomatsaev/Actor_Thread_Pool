@@ -13,13 +13,16 @@ public class AddCourseMassage extends Action<Boolean> {
     public AddCourseMassage(Integer space, List<String> prerequisites) {
         this.space = space;
         this.prerequisites = prerequisites;
+        setActionName("Add Course Massage");
     }
 
     @Override
     protected void start() {
+        CoursePrivateState coursePrivateState = (CoursePrivateState) pool.getPrivateState(actorID);
+        coursePrivateState.setAvailableSpots(space);
+        coursePrivateState.setPrerequisites(prerequisites);
+
         complete(true);
-        pool.getPrivateState(actorID).addRecord(getActionName());
-        ((CoursePrivateState)pool.getPrivateState(actorID)).setAvailableSpots(space);
-        ((CoursePrivateState)pool.getPrivateState(actorID)).setPrerequisites(prerequisites);
+        coursePrivateState.addRecord(getActionName());
     }
 }

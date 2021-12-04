@@ -10,6 +10,7 @@ public class ParticipateMassage extends Action<Boolean> {
 
     public ParticipateMassage(String student) {
         this.student = student;
+        setActionName("Participate Massage");
     }
 
     @Override
