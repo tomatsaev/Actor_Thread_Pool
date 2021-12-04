@@ -1,6 +1,7 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
+import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 
 public class AddSpacesAction extends Action<String> {
     String course;
@@ -22,6 +23,9 @@ public class AddSpacesAction extends Action<String> {
 
     @Override
     protected void start() {
-
+        CoursePrivateState coursePrivateState = ((CoursePrivateState) pool.getPrivateState(actorID));
+        coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() + number);
+        coursePrivateState.addRecord(getActionName());
+        complete("Successfully added " + number + " more spaces to course " + course + ".");
     }
 }

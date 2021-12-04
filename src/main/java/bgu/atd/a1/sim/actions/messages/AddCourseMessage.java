@@ -1,4 +1,4 @@
-package bgu.atd.a1.sim.messages;
+package bgu.atd.a1.sim.actions.messages;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;

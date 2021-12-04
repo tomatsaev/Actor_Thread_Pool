@@ -1,5 +1,7 @@
 package bgu.atd.a1;
 
+import bgu.atd.a1.sim.Warehouse;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -29,6 +31,7 @@ public class ActorThreadPool {
 	private final HashMap<String, PrivateState> actors = new HashMap<>();
 	private final Map<String, Lock> locksByID = new ConcurrentHashMap<>();
 	private final Map<String, Queue<Action<?>>> actionsByActorID = new ConcurrentHashMap<>();
+	public Warehouse warehouse;
 
 	/**
 	 * creates a {@link ActorThreadPool} which has nthreads. Note, threads
