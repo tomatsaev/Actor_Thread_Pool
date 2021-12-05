@@ -47,7 +47,7 @@ public class ParticipateInCourseAction extends Action<String> {
 //                 else
 //                    complete("Failed to add student " + student + " to participate course " + course + ".");
             });
-            sendMessage(participateMessage, course, new StudentPrivateState());
+            sendMessage(participateMessage, student, new StudentPrivateState());
         }
         else{
             complete("No room available for Student " + student + " to participate course " + course + ".");

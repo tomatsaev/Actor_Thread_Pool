@@ -76,8 +76,8 @@ public class ActorThreadPool {
 	 * @param actorState actor's private state (actor's information)
 	 */
 	public void submit(Action<?> action, String actorId, PrivateState actorState) {
-		if (terminate)
-			return;
+//		if (terminate)
+//			return;
 		actors.putIfAbsent(actorId, actorState);
 		actionsByActorID.putIfAbsent(actorId, new ConcurrentLinkedQueue<>());
 		locksByID.putIfAbsent(actorId, new ReentrantLock());
@@ -93,13 +93,13 @@ public class ActorThreadPool {
 		currentActions.incrementAndGet();
 		System.out.println("submit: Number of actions after increment: " + currentActions.get());
 
-		threadsLock.lock();
-		if (activeThreads.size() < nthreads && activeThreads.size() < actionsByActorID.keySet().size()) {
-			Thread worker = sleepingThreads.remove(0);
-			worker.start();
-			activeThreads.add(worker);
-		}
-		threadsLock.unlock();
+//		threadsLock.lock();
+//		if (activeThreads.size() < nthreads && activeThreads.size() < actionsByActorID.keySet().size()) {
+//			Thread worker = sleepingThreads.remove(0);
+//			worker.start();
+//			activeThreads.add(worker);
+//		}
+//		threadsLock.unlock();
 
 	}
 
@@ -120,9 +120,15 @@ public class ActorThreadPool {
 		}
 		for (Thread thread: activeThreads) {
 			thread.interrupt();
+//			thread.join();
 			System.out.println("shutdown: found an active thread: " + thread.getName());
 		}
-		System.exit(0);
+		for (Thread thread: sleepingThreads) {
+			thread.interrupt();
+//			thread.join();
+			System.out.println("shutdown: found an active thread: " + thread.getName());
+		}
+//		System.exit(0);
 	}
 
 	/**
@@ -132,22 +138,24 @@ public class ActorThreadPool {
 		for (int i = 0; i < nthreads; i++) {
 			Thread worker = new Thread(this::task);
 			worker.setName("Worker " + (i));
-			sleepingThreads.add(worker);
+//			sleepingThreads.add(worker);
+			activeThreads.add(worker);
+			worker.start();
 		}
 
 	}
 
 	private void task(){
         while (true) {
-			threadsLock.lock();
-			if (activeThreads.size() > actionsByActorID.keySet().size()) {
-				System.out.println("task: found self " + activeThreads.remove(Thread.currentThread()));
-				activeThreads.remove(Thread.currentThread());
-				sleepingThreads.add(Thread.currentThread());
-				threadsLock.unlock();
-				Thread.currentThread().interrupt();
-			} else
-				threadsLock.unlock();
+//			threadsLock.lock();
+//			if (activeThreads.size() > actionsByActorID.keySet().size()) {
+//				System.out.println("task: found self " + activeThreads.remove(Thread.currentThread()));
+//				activeThreads.remove(Thread.currentThread());
+//				sleepingThreads.add(Thread.currentThread());
+//				threadsLock.unlock();
+//				Thread.currentThread().interrupt();
+//			} else
+//				threadsLock.unlock();
             for (String actor : locksByID.keySet()) {
                 try {
                     if (locksByID.get(actor).tryLock()) {

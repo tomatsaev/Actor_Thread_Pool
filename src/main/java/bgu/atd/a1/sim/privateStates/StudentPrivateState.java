@@ -1,6 +1,8 @@
 package bgu.atd.a1.sim.privateStates;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 import bgu.atd.a1.PrivateState;
@@ -25,7 +27,13 @@ public class StudentPrivateState extends PrivateState{
 	public HashMap<String, Integer> getGrades() {
 		return grades;
 	}
-
+	public List<String> getGradesSer() {
+		List<String> l = new ArrayList<>();
+		for (String key : grades.keySet()) {
+			l.add(String.format("(%s, %s)", key, grades.get(key)));
+		}
+		return l;
+	}
 	public long getSignature() {
 		return signature;
 	}

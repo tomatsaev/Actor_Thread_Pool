@@ -1,5 +1,6 @@
 package bgu.atd.a1.sim.privateStates;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -10,9 +11,9 @@ import bgu.atd.a1.PrivateState;
  */
 public class CoursePrivateState extends PrivateState{
 
-	private Integer availableSpots;
-	private Integer registered;
-	private List<String> regStudents;
+	private Integer availableSpots = 0;
+	private Integer registered = 0;
+	private List<String> regStudents = new ArrayList();
 	private List<String> prerequisites;
 	
 	/**

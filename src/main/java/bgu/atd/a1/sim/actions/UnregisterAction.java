@@ -37,6 +37,7 @@ public class UnregisterAction extends Action<String> {
                 coursePrivateState.setRegistered(coursePrivateState.getRegistered() - 1);
                 coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() + 1);
                 coursePrivateState.addRecord(getActionName());
+//                System.out.println("UNREGISTERRRRRR");
                 complete("Unregister student "+student+ " from course "+ course+ " successfully.");
             });
         } else {
