@@ -254,7 +254,8 @@ public class Simulator {
                 for (int i = 0; i < coursesJsonArray.size(); i++) {
                     courses[i] = coursesJsonArray.get(i).getAsString();
                 }
-                action = new RegisterWithPreferanceAction(student, courses);
+                action = new RegisterWithPreferanceAction(student, courses, new String[]{"s"});
+//                TODO: add grade
                 actorID = student;
                 privateState = new StudentPrivateState();
                 break;

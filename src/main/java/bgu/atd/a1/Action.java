@@ -19,7 +19,7 @@ public abstract class Action<R> {
 
     private final Promise<R> promise = new Promise<>();
     protected ActorThreadPool pool;
-    private final AtomicInteger dependenciesCounter = new AtomicInteger(0);
+//    private final AtomicInteger dependenciesCounter = new AtomicInteger(0);
     protected String actorID;
     private Boolean started = false;
     private PrivateState actorState;
@@ -77,7 +77,7 @@ public abstract class Action<R> {
         if (actions.isEmpty()) {
             return;
         }
-        dependenciesCounter.addAndGet(actions.size());
+        AtomicInteger dependenciesCounter = new AtomicInteger(actions.size());
         for (Action<?> action: actions) {
             action.getResult().subscribe(() ->
             {
