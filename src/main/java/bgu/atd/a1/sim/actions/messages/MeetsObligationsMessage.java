@@ -21,5 +21,6 @@ public class MeetsObligationsMessage extends Action<Boolean> {
         StudentPrivateState studentPrivateState = (StudentPrivateState) pool.getPrivateState(actorID);
         long sig = computer.checkAndSign(conditions, studentPrivateState.getGrades());
         studentPrivateState.setSignature(sig);
+        complete(true);
     }
 }

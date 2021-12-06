@@ -60,9 +60,8 @@ public class AdministrativeCheckAction extends Action<String> {
                 pool.warehouse.release(computerType);
                 departmentPrivateState.addRecord(getActionName());
             });
-
-            for (int i = 0; i < actions.size(); i++) {
-                sendMessage(actions.get(i), departmentPrivateState.getStudentList().get(i), new StudentPrivateState());
+            for (int i = 0; i < studentsActions.size(); i++) {
+                sendMessage(studentsActions.get(i), students[i], new StudentPrivateState());
             }
         });
         sendMessage(getComputerMessage, "WareHouse", new WarehousePrivateState());

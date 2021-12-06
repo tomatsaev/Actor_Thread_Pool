@@ -13,7 +13,6 @@ public class AddCourseMessage extends Action<Boolean> {
     public AddCourseMessage(Integer space, List<String> prerequisites) {
         this.space = space;
         this.prerequisites = prerequisites;
-        setActionName("Add Course Message");
     }
 
     @Override
@@ -23,6 +22,5 @@ public class AddCourseMessage extends Action<Boolean> {
         coursePrivateState.setPrerequisites(prerequisites);
 
         complete(true);
-        coursePrivateState.addRecord(getActionName());
     }
 }

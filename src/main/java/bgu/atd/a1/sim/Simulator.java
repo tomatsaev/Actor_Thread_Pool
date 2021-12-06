@@ -45,16 +45,19 @@ public class Simulator {
             CountDownLatch phase2Countdown = new CountDownLatch(phase2Actions.size());
             CountDownLatch phase3Countdown = new CountDownLatch(phase3Actions.size());
 
+            System.out.println("PHASE 1:");
             for (Action action : phase1Actions.keySet()) {
                 actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
                 action.getResult().subscribe(phase1Countdown::countDown);
             }
             phase1Countdown.await();
+            System.out.println("PHASE 2:");
             for (Action action : phase2Actions.keySet()) {
                 actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
                 action.getResult().subscribe(phase2Countdown::countDown);
             }
             phase2Countdown.await();
+            System.out.println("PHASE 3:");
             for (Action action : phase3Actions.keySet()) {
                 actorThreadPool.submit(action, phase3Actions.get(action).getKey(), phase3Actions.get(action).getValue());
                 action.getResult().subscribe(phase3Countdown::countDown);

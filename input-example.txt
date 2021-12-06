@@ -1,5 +1,5 @@
 {
-"threads": 1,
+"threads": 3,
 "Computers" : [
 {
 "Type":"A",
@@ -64,6 +64,12 @@
 "Student": "5959595959",
 "Course": "Intro To CS",
 "Grade": ["94"]
+},
+{
+"Action": "Participate In Course",
+"Student": "5959595959",
+"Course": "SPL",
+"Grade": ["100"]
 }
 ],
 "Phase 3": [
@@ -78,12 +84,6 @@
 "Student": "123456789",
 "Course": "Data Structures",
 "Grade": ["90"]
-},
-{
-"Action": "Participate In Course",
-"Student": "5959595959",
-"Course": "SPL",
-"Grade": ["100"]
 },
 {
 "Action": "Unregister",
