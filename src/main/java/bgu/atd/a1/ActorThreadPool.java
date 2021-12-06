@@ -86,12 +86,12 @@ public class ActorThreadPool {
 		action.getResult().subscribe(() ->
 				action.getResult().subscribe(() -> {
 					currentActions.decrementAndGet();
-					System.out.println("promise: Number of actions after decrement: " + currentActions.get());
+//					System.out.println("promise: Number of actions after decrement: " + currentActions.get());
 				}));
 
 		currentActions.incrementAndGet();
 		actionsByActorID.get(actorId).add(action);
-		System.out.println("submit: Number of actions after increment: " + currentActions.get());
+//		System.out.println("submit: Number of actions after increment: " + currentActions.get());
 
 //		threadsLock.lock();
 //		if (activeThreads.size() < nthreads && activeThreads.size() < actionsByActorID.keySet().size()) {

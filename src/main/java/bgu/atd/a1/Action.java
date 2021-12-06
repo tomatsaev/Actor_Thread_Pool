@@ -94,7 +94,7 @@ public abstract class Action<R> {
      * @param result - the action calculated result
      */
     protected final void complete(R result) {
-        Stream.of(this.actorState.getLogger()).forEach(System.out::println);
+//        Stream.of(this.actorState.getLogger()).forEach(System.out::println);
         this.promise.resolve(result);
     }
 
