@@ -13,7 +13,7 @@ public class CoursePrivateState extends PrivateState{
 
 	private Integer availableSpots = 0;
 	private Integer registered = 0;
-	private List<String> regStudents = new ArrayList();
+	private List<String> regStudents = new ArrayList<>();
 	private List<String> prerequisites;
 	
 	/**
@@ -22,7 +22,6 @@ public class CoursePrivateState extends PrivateState{
 	 * this may cause automatic tests to fail..
 	 */
 	public CoursePrivateState() {
-		//TODO: replace method body with real implementation
 	}
 
 	public Integer getAvailableSpots() {

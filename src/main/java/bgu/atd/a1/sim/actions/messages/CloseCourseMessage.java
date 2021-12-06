@@ -24,6 +24,7 @@ public class CloseCourseMessage extends Action<Boolean> {
             actions.add(removeGrade);
         }
         then(actions, () -> {
+            coursePrivateState.setAvailableSpots(-1);
             complete(true);
             coursePrivateState.addRecord(getActionName());
         });
