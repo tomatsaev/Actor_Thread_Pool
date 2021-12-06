@@ -48,8 +48,8 @@ public class OpenCourseAction extends Action<String> {
             if(actions.get(0).getResult().get()) {
                 privateState.getCourseList().add(course);
                 complete("Course " + course + " was added to " + department + " department successfully");
-                System.out.println("Course " + course + " was added to " + department + " department successfully");
                 privateState.addRecord(getActionName());
+                System.out.println("Course " + course + " was added to " + department + " department successfully");
             }
             else {
                 complete("Course " + course + " was NOT added to " + department + " department");

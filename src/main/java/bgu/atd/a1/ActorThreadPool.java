@@ -84,10 +84,8 @@ public class ActorThreadPool {
 
 //		currentActions is decremented last (added again), so the program shuts down gracefully
 		action.getResult().subscribe(() ->
-				action.getResult().subscribe(() -> {
-					currentActions.decrementAndGet();
-//					System.out.println("promise: Number of actions after decrement: " + currentActions.get());
-				}));
+				action.getResult().subscribe(() ->
+						action.getResult().subscribe(currentActions::decrementAndGet)));
 
 		currentActions.incrementAndGet();
 		actionsByActorID.get(actorId).add(action);

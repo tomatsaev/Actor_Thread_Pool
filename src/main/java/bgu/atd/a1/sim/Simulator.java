@@ -8,6 +8,7 @@ package bgu.atd.a1.sim;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -48,19 +49,22 @@ public class Simulator {
             System.out.println("PHASE 1:");
             for (Action action : phase1Actions.keySet()) {
                 actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
-                action.getResult().subscribe(phase1Countdown::countDown);
+                action.getResult().subscribe(() ->
+                        action.getResult().subscribe(phase1Countdown::countDown));
             }
             phase1Countdown.await();
             System.out.println("PHASE 2:");
             for (Action action : phase2Actions.keySet()) {
                 actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
-                action.getResult().subscribe(phase2Countdown::countDown);
+                action.getResult().subscribe(() ->
+                        action.getResult().subscribe(phase2Countdown::countDown));
             }
             phase2Countdown.await();
             System.out.println("PHASE 3:");
             for (Action action : phase3Actions.keySet()) {
                 actorThreadPool.submit(action, phase3Actions.get(action).getKey(), phase3Actions.get(action).getValue());
-                action.getResult().subscribe(phase3Countdown::countDown);
+                action.getResult().subscribe(() ->
+                        action.getResult().subscribe(phase3Countdown::countDown));
             }
             phase3Countdown.await();
 
@@ -123,7 +127,7 @@ public class Simulator {
 
             // Extracting Computers
             JsonArray jsonArrayOfComputers = fileObject.get("Computers").getAsJsonArray();
-            Map<Computer, Lock> computerLockMap = new HashMap<>();
+            Map<Computer, AtomicBoolean> computerLockMap = new HashMap<>();
             for (JsonElement computerElement : jsonArrayOfComputers) {
                 JsonObject computerJsonObject = computerElement.getAsJsonObject();
 
@@ -133,7 +137,7 @@ public class Simulator {
                 long failSig = computerJsonObject.get("Sig Fail").getAsLong();
 
                 Computer computer = new Computer(computerType, successSig, failSig);
-                computerLockMap.put(computer, new ReentrantLock());
+                computerLockMap.put(computer, new AtomicBoolean(false));
             }
             warehouse = new Warehouse(computerLockMap);
 
