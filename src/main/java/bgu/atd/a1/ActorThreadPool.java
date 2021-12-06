@@ -89,8 +89,8 @@ public class ActorThreadPool {
 					System.out.println("promise: Number of actions after decrement: " + currentActions.get());
 				}));
 
-		actionsByActorID.get(actorId).add(action);
 		currentActions.incrementAndGet();
+		actionsByActorID.get(actorId).add(action);
 		System.out.println("submit: Number of actions after increment: " + currentActions.get());
 
 //		threadsLock.lock();

@@ -8,6 +8,8 @@ package bgu.atd.a1.sim;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.ActorThreadPool;
@@ -71,7 +73,7 @@ public class Simulator {
      */
     public static void attachActorThreadPool(ActorThreadPool myActorThreadPool) {
         actorThreadPool = myActorThreadPool;
-//        actorThreadPool.warehouse = warehouse;
+        actorThreadPool.warehouse = warehouse;
     }
 
     /**
@@ -121,6 +123,7 @@ public class Simulator {
 
             // Extracting Computers
             JsonArray jsonArrayOfComputers = fileObject.get("Computers").getAsJsonArray();
+            Map<Computer, Lock> computerLockMap = new HashMap<>();
             for (JsonElement computerElement : jsonArrayOfComputers) {
                 JsonObject computerJsonObject = computerElement.getAsJsonObject();
 
@@ -130,8 +133,9 @@ public class Simulator {
                 long failSig = computerJsonObject.get("Sig Fail").getAsLong();
 
                 Computer computer = new Computer(computerType, successSig, failSig);
-//                warehouse.addComputer(computer);
+                computerLockMap.put(computer, new ReentrantLock());
             }
+            warehouse = new Warehouse(computerLockMap);
 
             // Extracting Phase 1
             JsonArray jsonArrayOfPhase1 = fileObject.get("Phase 1").getAsJsonArray();
@@ -254,16 +258,16 @@ public class Simulator {
             case "Register With Preferences":
                 student = actionObject.get("Student").getAsString();
                 JsonArray coursesJsonArray = actionObject.get("Conditions").getAsJsonArray();
-                String[] courses = new String[coursesJsonArray.size()];
+                List<String> courses = new ArrayList();
                 for (int i = 0; i < coursesJsonArray.size(); i++) {
-                    courses[i] = coursesJsonArray.get(i).getAsString();
+                    courses.add(coursesJsonArray.get(i).getAsString());
                 }
                 JsonArray gradesJsonArray1 = actionObject.get("Grade").getAsJsonArray();
                 String[] grades1 = new String[gradesJsonArray1.size()];
                 for (int i = 0; i < gradesJsonArray1.size(); i++) {
                     grades1[i] = gradesJsonArray1.get(i).getAsString();
                 }
-                action = new RegisterWithPreferanceAction(student, courses, grades1);
+                action = new RegisterWithPreferenceAction(student, courses, grades1);
                 actorID = student;
                 privateState = new StudentPrivateState();
                 break;

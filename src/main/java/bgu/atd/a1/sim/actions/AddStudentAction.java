@@ -27,6 +27,7 @@ public class AddStudentAction extends Action<String> {
         privateState.addRecord(getActionName());
         privateState.getStudentList().add(student);
         complete("Student " + student + " was added to " + department + " department successfully");
+        System.out.println("Student " + student + " was added to " + department + " department successfully");
     }
 }
 

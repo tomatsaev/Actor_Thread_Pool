@@ -1,6 +1,7 @@
 package bgu.atd.a1.sim.actions.messages;
 
 import bgu.atd.a1.Action;
+import bgu.atd.a1.sim.Computer;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
 import java.util.List;
@@ -8,18 +9,17 @@ import java.util.List;
 public class MeetsObligationsMessage extends Action<Boolean> {
 
     List<String> conditions;
-    String computerType;
+    Computer computer;
 
-    public MeetsObligationsMessage(List<String> conditions, String computerType) {
+    public MeetsObligationsMessage(List<String> conditions, Computer computer) {
         this.conditions = conditions;
-        this.computerType = computerType;
-        setActionName("Meet Obligations Message");
+        this.computer = computer;
     }
 
     @Override
     protected void start() {
         StudentPrivateState studentPrivateState = (StudentPrivateState) pool.getPrivateState(actorID);
-        long sig = pool.warehouse.getComputer(computerType).checkAndSign(conditions, studentPrivateState.getGrades());
+        long sig = computer.checkAndSign(conditions, studentPrivateState.getGrades());
         studentPrivateState.setSignature(sig);
     }
 }

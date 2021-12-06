@@ -2,13 +2,13 @@ package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.Computer;
-import bgu.atd.a1.sim.actions.messages.ComputerPromise;
+import bgu.atd.a1.sim.actions.messages.GetComputerMessage;
 import bgu.atd.a1.sim.actions.messages.MeetsObligationsMessage;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
+import bgu.atd.a1.sim.privateStates.WarehousePrivateState;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class AdministrativeCheckAction extends Action<String> {
@@ -22,6 +22,7 @@ public class AdministrativeCheckAction extends Action<String> {
         this.students = students;
         this.computerType = computerType;
         this.conditions = conditions;
+        setActionName("Administrative Check");
     }
 
     public String getDepartment() {
@@ -42,36 +43,28 @@ public class AdministrativeCheckAction extends Action<String> {
 
     @Override
     protected void start() {
-        if(pool.warehouse.acquire(computerType)) {
-            sendMeetsObligationsMessage();
-        }
-        else{
-            ComputerPromise computerPromise = new ComputerPromise(computerType);
-            computerPromise.getResult().subscribe(this::sendMeetsObligationsMessage);
-            sendMessage(computerPromise, actorID, pool.getPrivateState(actorID));
-        }
-
-    }
-
-    /**
-     * send MeetsObligationsMessage to all students register to the department
-     * and release the Computer lock
-     */
-    private void sendMeetsObligationsMessage (){
         DepartmentPrivateState departmentPrivateState = (DepartmentPrivateState) pool.getPrivateState(actorID);
-        List<MeetsObligationsMessage> actions = new ArrayList<>();
-        for (String student : students) {
-            MeetsObligationsMessage meetsObligationsMessage = new MeetsObligationsMessage(conditions, computerType);
-            actions.add(meetsObligationsMessage);
-        }
+        List<GetComputerMessage> actions = new ArrayList<>();
+        GetComputerMessage getComputerMessage = new GetComputerMessage(computerType);
+        actions.add(getComputerMessage);
         then(actions, () -> {
-            for (MeetsObligationsMessage action : actions) {
-                // TODO
+            Computer computer = actions.get(0).getResult().get();
+            List<MeetsObligationsMessage> studentsActions = new ArrayList<>();
+            for (String student : students) {
+                MeetsObligationsMessage meetsObligationsMessage = new MeetsObligationsMessage(conditions, computer);
+                studentsActions.add(meetsObligationsMessage);
+            }
+            then(studentsActions, () -> {
+                complete("Administrative checks finished");
+                System.out.println("Administrative checks finished");
+                pool.warehouse.release(computerType);
+                departmentPrivateState.addRecord(getActionName());
+            });
+
+            for (int i = 0; i < actions.size(); i++) {
+                sendMessage(actions.get(i), departmentPrivateState.getStudentList().get(i), new StudentPrivateState());
             }
         });
-        for (int i = 0; i < actions.size(); i++) {
-            sendMessage(actions.get(i), departmentPrivateState.getStudentList().get(i), new StudentPrivateState());
-        }
-        pool.warehouse.release(computerType);
+        sendMessage(getComputerMessage, "WareHouse", new WarehousePrivateState());
     }
 }

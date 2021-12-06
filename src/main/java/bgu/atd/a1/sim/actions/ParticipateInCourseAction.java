@@ -41,16 +41,16 @@ public class ParticipateInCourseAction extends Action<String> {
             Action<Boolean> participateMessage = new ParticipateMessage(student, course, grades);
             actions.add(participateMessage);
             then(actions, () -> {
-                coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() - 1);
+                coursePrivateState.addStudent(student);
                 complete("Student " + student + " is participating course " + course + " successfully.");
+                System.out.println("Student " + student + " is participating course " + course + " successfully.");
                 coursePrivateState.addRecord(getActionName());
-//                 else
-//                    complete("Failed to add student " + student + " to participate course " + course + ".");
             });
             sendMessage(participateMessage, student, new StudentPrivateState());
         }
         else{
             complete("No room available for Student " + student + " to participate course " + course + ".");
+            System.out.println("No room available for Student " + student + " to participate course " + course + ".");
         }
     }
 }

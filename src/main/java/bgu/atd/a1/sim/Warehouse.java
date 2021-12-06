@@ -12,14 +12,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Warehouse {
 
-    private Map<Computer, Lock> computerMap = new ConcurrentHashMap<Computer, Lock>();
+    private Map<Computer, Lock> computerMap;
 
     public Warehouse(Map<Computer, Lock> computerMap) {
         this.computerMap = computerMap;
-    }
-
-    public void addComputer(Computer computer){
-        computerMap.put(computer, new ReentrantLock());
     }
 
     public Computer getComputer(String computerType){
@@ -31,11 +27,10 @@ public class Warehouse {
         return null;
     }
 
-    public boolean acquire(String computerType){
+    public void acquire(String computerType){
         Computer computer = getComputer(computerType);
         if(computer != null)
-            return computerMap.get(computer).tryLock();
-        return false;
+            computerMap.get(computer).lock();
     }
 
     public void release(String computerType){

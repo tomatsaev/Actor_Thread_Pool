@@ -56,4 +56,16 @@ public class CoursePrivateState extends PrivateState{
 	public void setPrerequisites(List<String> prerequisites) {
 		this.prerequisites = prerequisites;
 	}
+
+	public void addStudent(String student){
+		registered++;
+		availableSpots--;
+		regStudents.add(student);
+	}
+
+	public void removeStudent(String student){
+		registered--;
+		availableSpots++;
+		regStudents.remove(student);
+	}
 }

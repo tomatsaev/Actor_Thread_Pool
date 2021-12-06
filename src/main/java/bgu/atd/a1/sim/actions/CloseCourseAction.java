@@ -24,6 +24,7 @@ public class CloseCourseAction extends Action<String> {
 
         if (!privateState.getCourseList().contains(course)) {
             complete("Course " + course + " does NOT exist in " + department + " department");
+            System.out.println("Course " + course + " does NOT exist in " + department + " department");
             return;
         }
 
@@ -32,14 +33,17 @@ public class CloseCourseAction extends Action<String> {
         actions.add(closeCourse);
         then(actions, ()->{
             if(actions.get(0).getResult().get()) {
+                privateState.getCourseList().remove(course);
                 complete("Course " + course + " was removed from " + department + " department successfully");
-                pool.getPrivateState(actorID).addRecord(getActionName());
+                System.out.println("Course " + course + " was removed from " + department + " department successfully");
             }
-            else
+            else {
                 complete("Course " + course + " was NOT removed from " + department + " department");
+                System.out.println("Course " + course + " was NOT removed from " + department + " department");
+            }
         });
         sendMessage(closeCourse, course, new CoursePrivateState());
 
-        privateState.getCourseList().remove(course);
+        privateState.addRecord(getActionName());
     }
 }

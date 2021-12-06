@@ -27,5 +27,6 @@ public class AddSpacesAction extends Action<String> {
         coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() + number);
         coursePrivateState.addRecord(getActionName());
         complete("Successfully added " + number + " more spaces to course " + course + ".");
+        System.out.println("Successfully added " + number + " more spaces to course " + course + ".");
     }
 }

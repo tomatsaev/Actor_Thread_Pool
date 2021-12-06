@@ -33,15 +33,14 @@ public class UnregisterAction extends Action<String> {
             Action unregisterMessage = new UnregisterMessage(course);
             actions.add(unregisterMessage);
             then(actions, () -> {
-                coursePrivateState.getRegStudents().remove(student);
-                coursePrivateState.setRegistered(coursePrivateState.getRegistered() - 1);
-                coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() + 1);
+                coursePrivateState.removeStudent(student);
                 coursePrivateState.addRecord(getActionName());
-//                System.out.println("UNREGISTERRRRRR");
                 complete("Unregister student "+student+ " from course "+ course+ " successfully.");
+                System.out.println("Unregister student "+student+ " from course "+ course+ " successfully.");
             });
         } else {
             complete("Unregister " + student + " is unnecessary because they are not register.");
+            System.out.println("Unregister " + student + " is unnecessary because they are not register.");
         }
     }
 }

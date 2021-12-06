@@ -81,8 +81,8 @@ public abstract class Action<R> {
         for (Action<?> action: actions) {
             action.getResult().subscribe(() ->
             {
-                if (dependenciesCounter.decrementAndGet() == 0)
-                    pool.submit(this, this.actorID, this.actorState);
+            if (dependenciesCounter.decrementAndGet() == 0)
+                pool.submit(this, this.actorID, this.actorState);
             });
         }
     }

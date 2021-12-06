@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RegisterWithPreferenceMessage extends Action<Boolean> {
+
+    String student;
     String course;
     List<String> prerequisites;
 
-    public RegisterWithPreferenceMessage(String course, List<String> prerequisites) {
+    public RegisterWithPreferenceMessage(String student, String course, List<String> prerequisites) {
+        this.student = student;
         this.course = course;
         this.prerequisites = prerequisites;
     }
@@ -21,10 +24,13 @@ public class RegisterWithPreferenceMessage extends Action<Boolean> {
         List<String> coursePrerequisites = coursePrivateState.getPrerequisites();
         if(coursePrivateState.getAvailableSpots() > 0) {
             for (String pre : coursePrerequisites) {
-                if (!this.prerequisites.contains(pre))
+                if (!this.prerequisites.contains(pre)) {
                     complete(false);
+                    return;
+                }
             }
-            coursePrivateState.setAvailableSpots(coursePrivateState.getAvailableSpots() - 1);
+            coursePrivateState.addStudent(student);
+
             complete(true);
             coursePrivateState.addRecord(getActionName());
         }

@@ -15,7 +15,6 @@ public class ParticipateMessage extends Action<Boolean> {
         this.student = student;
         this.course = course;
         this.grades = grades;
-        setActionName("Participate Message");
     }
 
     @Override
@@ -26,7 +25,6 @@ public class ParticipateMessage extends Action<Boolean> {
         else
             studentPrivateState.getGrades().put(course, null);
 
-        studentPrivateState.addRecord(getActionName());
         complete(true);
     }
 }
