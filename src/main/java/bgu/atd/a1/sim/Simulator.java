@@ -71,7 +71,7 @@ public class Simulator {
      */
     public static void attachActorThreadPool(ActorThreadPool myActorThreadPool) {
         actorThreadPool = myActorThreadPool;
-        actorThreadPool.warehouse = warehouse;
+//        actorThreadPool.warehouse = warehouse;
     }
 
     /**
@@ -81,6 +81,7 @@ public class Simulator {
     public static HashMap<String, PrivateState> end() {
         try {
             actorThreadPool.shutdown();
+            System.out.println("SHUTTING DOWN COMPLETE");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -95,14 +96,17 @@ public class Simulator {
         start();
         Map<String, PrivateState> simulationResult;
         simulationResult = end();
-        try {
-            FileOutputStream out = new FileOutputStream("result.ser");
-            ObjectOutputStream oos = new ObjectOutputStream(out);
-            oos.writeObject(simulationResult);
+
+            try{
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                FileWriter outputFile = new FileWriter("result.json");
+                Output outputObject = new Output(end());
+                gson.toJson(outputObject,outputFile);
+                outputFile.close(); // close file after finish writing
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        System.out.println("FINISHED");
     }
 
     private static void parse(String s) {
@@ -126,7 +130,7 @@ public class Simulator {
                 long failSig = computerJsonObject.get("Sig Fail").getAsLong();
 
                 Computer computer = new Computer(computerType, successSig, failSig);
-                warehouse.addComputer(computer);
+//                warehouse.addComputer(computer);
             }
 
             // Extracting Phase 1
@@ -254,8 +258,12 @@ public class Simulator {
                 for (int i = 0; i < coursesJsonArray.size(); i++) {
                     courses[i] = coursesJsonArray.get(i).getAsString();
                 }
-                action = new RegisterWithPreferanceAction(student, courses, new String[]{"s"});
-//                TODO: add grade
+                JsonArray gradesJsonArray1 = actionObject.get("Grade").getAsJsonArray();
+                String[] grades1 = new String[gradesJsonArray1.size()];
+                for (int i = 0; i < gradesJsonArray1.size(); i++) {
+                    grades1[i] = gradesJsonArray1.get(i).getAsString();
+                }
+                action = new RegisterWithPreferanceAction(student, courses, grades1);
                 actorID = student;
                 privateState = new StudentPrivateState();
                 break;

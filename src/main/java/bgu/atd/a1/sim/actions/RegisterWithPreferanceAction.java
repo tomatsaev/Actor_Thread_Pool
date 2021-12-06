@@ -1,7 +1,7 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
-import bgu.atd.a1.sim.messages.RegisterWithPreferenceMessage;
+import bgu.atd.a1.sim.actions.messages.RegisterWithPreferenceMessage;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class RegisterWithPreferanceAction extends Action<Boolean> {
                 pool.getPrivateState(actorID).addRecord(getActionName());
             }
             else {
-                RegisterWithPreferanceAction nextCourse = new RegisterWithPreferanceAction(student,Arrays.copyOfRange(courses, 1, courses.length), grade);
+                RegisterWithPreferanceAction nextCourse = new RegisterWithPreferanceAction(student, Arrays.copyOfRange(courses, 1, courses.length), grade);
                 sendMessage(nextCourse, course, new StudentPrivateState());
             }
         });
