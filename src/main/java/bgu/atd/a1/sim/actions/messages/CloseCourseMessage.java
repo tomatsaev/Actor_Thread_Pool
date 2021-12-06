@@ -24,8 +24,8 @@ public class CloseCourseMessage extends Action<Boolean> {
             actions.add(removeGrade);
         }
         then(actions, () -> {
-            coursePrivateState.addRecord(getActionName());
             complete(true);
+            coursePrivateState.addRecord(getActionName());
         });
         for (int i = 0; i < actions.size(); i++) {
             sendMessage(actions.get(i), coursePrivateState.getRegStudents().get(i), new StudentPrivateState());

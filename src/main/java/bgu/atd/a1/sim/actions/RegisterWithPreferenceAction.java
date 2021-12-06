@@ -2,6 +2,7 @@ package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.actions.messages.RegisterWithPreferenceMessage;
+import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
 import java.util.ArrayList;
@@ -30,12 +31,12 @@ public class RegisterWithPreferenceAction extends Action<Boolean> {
 
     @Override
     protected void start() {
+        StudentPrivateState privateState = (StudentPrivateState) pool.getPrivateState(actorID);
         if(courses.isEmpty()) {
             complete(false);
             return;
         }
         String course = courses.remove(0);
-        StudentPrivateState privateState = (StudentPrivateState) pool.getPrivateState(actorID);
         List<String> studentPrereqs = new ArrayList<>(privateState.getGrades().keySet());
         List<Action<Boolean>> actions = new ArrayList<>();
         Action<Boolean> registerWithPreferenceMessage = new RegisterWithPreferenceMessage(student, course, studentPrereqs);
@@ -47,8 +48,9 @@ public class RegisterWithPreferenceAction extends Action<Boolean> {
             }
             else {
                 RegisterWithPreferenceAction nextCourse = new RegisterWithPreferenceAction(student, courses, grade);
-                sendMessage(nextCourse, course, new StudentPrivateState());
+                sendMessage(nextCourse, course, privateState);
             }
         });
+        sendMessage(registerWithPreferenceMessage, course, new CoursePrivateState());
     }
 }

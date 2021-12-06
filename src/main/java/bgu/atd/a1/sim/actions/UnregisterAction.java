@@ -3,6 +3,7 @@ package bgu.atd.a1.sim.actions;
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.actions.messages.UnregisterMessage;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;
+import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class UnregisterAction extends Action<String> {
                 complete("Unregister student "+student+ " from course "+ course+ " successfully.");
                 System.out.println("Unregister student "+student+ " from course "+ course+ " successfully.");
             });
+            sendMessage(unregisterMessage, student, new StudentPrivateState());
         } else {
             complete("Unregister " + student + " is unnecessary because they are not register.");
             System.out.println("Unregister " + student + " is unnecessary because they are not register.");
