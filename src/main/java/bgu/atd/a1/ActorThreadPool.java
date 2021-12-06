@@ -5,6 +5,7 @@ import bgu.atd.a1.sim.Warehouse;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,7 +25,7 @@ public class ActorThreadPool {
 
 	private final Integer nthreads;
 	private final AtomicInteger currentActions = new AtomicInteger(0);
-	protected Boolean terminate = false;
+	protected AtomicBoolean terminate = new AtomicBoolean(false);
 	private final List<Thread> activeThreads = new ArrayList<>();
 	private final List<Thread> sleepingThreads = new ArrayList<>();
 	private final Lock threadsLock  = new ReentrantLock();
@@ -76,8 +77,8 @@ public class ActorThreadPool {
 	 * @param actorState actor's private state (actor's information)
 	 */
 	public void submit(Action<?> action, String actorId, PrivateState actorState) {
-//		if (terminate)
-//			return;
+		if (terminate.get())
+			return;
 		actors.putIfAbsent(actorId, actorState);
 		actionsByActorID.putIfAbsent(actorId, new ConcurrentLinkedQueue<>());
 		locksByID.putIfAbsent(actorId, new ReentrantLock());
@@ -91,14 +92,13 @@ public class ActorThreadPool {
 		actionsByActorID.get(actorId).add(action);
 //		System.out.println("submit: Number of actions after increment: " + currentActions.get());
 
-//		threadsLock.lock();
-//		if (activeThreads.size() < nthreads && activeThreads.size() < actionsByActorID.keySet().size()) {
-//			Thread worker = sleepingThreads.remove(0);
-//			worker.start();
-//			activeThreads.add(worker);
-//		}
-//		threadsLock.unlock();
-
+		synchronized (threadsLock) {
+			if (activeThreads.size() < nthreads && activeThreads.size() < playingNowCount()) {
+				Thread worker = sleepingThreads.remove(0);
+				threadsLock.notify();
+				activeThreads.add(worker);
+			}
+		}
 	}
 
 	/**
@@ -111,22 +111,29 @@ public class ActorThreadPool {
 	 * @throws InterruptedException if the thread that shut down the threads is interrupted
 	 */
 	public void shutdown() throws InterruptedException {
-		terminate = true;
+		terminate.set(true);
 		System.out.println("shutdown: Number of actions after shutdown: " + currentActions.get());
+		System.out.println("shutdown: Number of active threads after shutdown: " + activeThreads.size());
+		System.out.println("shutdown: Number of sleeping threads after shutdown: " + sleepingThreads.size());
 		while (currentActions.get() != 0) {
 			Thread.sleep(1000);
 		}
-		for (Thread thread: activeThreads) {
-			thread.interrupt();
-//			thread.join();
-			System.out.println("shutdown: found an active thread: " + thread.getName());
+//		for (Thread thread: activeThreads) {
+//			synchronized (threadsLock) {
+//				threadsLock.notify();
+//				thread.join();
+//				System.out.println("shutdown: found an active thread: " + thread.getName());
+//			}
+//		}
+		for (Thread thread: sleepingThreads) {
+			synchronized (threadsLock) {
+				threadsLock.notify();
+				System.out.println("shutdown: found a sleeping thread: " + thread.getName());
+			}
 		}
 		for (Thread thread: sleepingThreads) {
-			thread.interrupt();
-//			thread.join();
-			System.out.println("shutdown: found an active thread: " + thread.getName());
+			thread.join();
 		}
-//		System.exit(0);
 	}
 
 	/**
@@ -142,22 +149,35 @@ public class ActorThreadPool {
 		}
 
 	}
+	private int playingNowCount() {
+		int counter = 0;
+		for (Queue<Action<?>> actions : actionsByActorID.values())
+				if (!actions.isEmpty())
+					counter++;
+		return counter;
+	}
 
-	private void task(){
+
+	private void task() {
+		Action<?> currAction;
         while (true) {
-//			threadsLock.lock();
-//			if (activeThreads.size() > actionsByActorID.keySet().size()) {
-//				System.out.println("task: found self " + activeThreads.remove(Thread.currentThread()));
-//				activeThreads.remove(Thread.currentThread());
-//				sleepingThreads.add(Thread.currentThread());
-//				threadsLock.unlock();
-//				Thread.currentThread().interrupt();
-//			} else
-//				threadsLock.unlock();
+			synchronized (threadsLock) {
+				if (activeThreads.size() > playingNowCount()) {
+					System.out.println("task: found self " + activeThreads.remove(Thread.currentThread()));
+					sleepingThreads.add(Thread.currentThread());
+					try {
+						threadsLock.wait();
+						if (terminate.get())
+							return;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
             for (String actor : locksByID.keySet()) {
                 try {
                     if (locksByID.get(actor).tryLock()) {
-                        Action<?> currAction = actionsByActorID.get(actor).poll();
+                        currAction = actionsByActorID.get(actor).poll();
                         if (currAction != null) {
                             currAction.handle(this, actor, actors.get(actor));
                         }

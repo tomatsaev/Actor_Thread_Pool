@@ -42,14 +42,14 @@ public class OpenCourseAction extends Action<String> {
     public void start() {
         DepartmentPrivateState privateState = (DepartmentPrivateState) pool.getPrivateState(actorID);
         List<Action<Boolean>> actions = new ArrayList<>();
-        Action addCourse = new AddCourseMessage(space, prerequisites);
+        Action<Boolean> addCourse = new AddCourseMessage(space, prerequisites);
         actions.add(addCourse);
         then(actions, ()->{
             if(actions.get(0).getResult().get()) {
                 privateState.getCourseList().add(course);
                 complete("Course " + course + " was added to " + department + " department successfully");
-                privateState.addRecord(getActionName());
                 System.out.println("Course " + course + " was added to " + department + " department successfully");
+                privateState.addRecord(getActionName());
             }
             else {
                 complete("Course " + course + " was NOT added to " + department + " department");
