@@ -18,6 +18,6 @@ public class RemoveCourseGradeMessage extends Action<Boolean> {
             System.out.println("student " + actorID + " removed "+ course + " course");
             complete(true);
         }
-        else throw new IllegalStateException("student " + actorID + " tried removing not existing course "+ course);
+        complete(false);
     }
 }

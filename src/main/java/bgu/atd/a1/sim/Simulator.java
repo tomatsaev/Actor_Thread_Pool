@@ -96,15 +96,12 @@ public class Simulator {
         attachActorThreadPool(new ActorThreadPool(nthreads));
         actorThreadPool.start();
         start();
-        Map<String, PrivateState> simulationResult;
-        simulationResult = end();
-
-            try{
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                FileWriter outputFile = new FileWriter("result.json");
-                Output outputObject = new Output(end());
-                gson.toJson(outputObject,outputFile);
-                outputFile.close(); // close file after finish writing
+        try{
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            FileWriter outputFile = new FileWriter("result.json");
+            Output outputObject = new Output(end());
+            gson.toJson(outputObject,outputFile);
+            outputFile.close(); // close file after finish writing
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -257,7 +254,7 @@ public class Simulator {
 
             case "Register With Preferences":
                 student = actionObject.get("Student").getAsString();
-                JsonArray coursesJsonArray = actionObject.get("Conditions").getAsJsonArray();
+                JsonArray coursesJsonArray = actionObject.get("Preferences").getAsJsonArray();
                 List<String> courses = new ArrayList();
                 for (int i = 0; i < coursesJsonArray.size(); i++) {
                     courses.add(coursesJsonArray.get(i).getAsString());
