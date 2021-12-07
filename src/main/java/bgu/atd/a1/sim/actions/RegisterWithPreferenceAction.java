@@ -5,6 +5,7 @@ import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RegisterWithPreferenceAction extends Action<Boolean> {
@@ -12,7 +13,7 @@ public class RegisterWithPreferenceAction extends Action<Boolean> {
     List<String> courses;
     String[] grade;
 
-    public RegisterWithPreferenceAction(String student, List courses, String[] grade) {
+    public RegisterWithPreferenceAction(String student, List<String> courses, String[] grade) {
         this.student = student;
         this.courses = courses;
         this.grade = grade;
@@ -35,9 +36,9 @@ public class RegisterWithPreferenceAction extends Action<Boolean> {
             return;
         }
         String course = courses.remove(0);
-        List<String> studentPrereqs = new ArrayList<>(privateState.getGrades().keySet());
+        String[] grade = {this.grade[0]};
         List<Action<Boolean>> actions = new ArrayList<>();
-        Action<Boolean> registerWithPreferenceMessage = new RegisterWithPreferenceMessage(student, course, studentPrereqs);
+        Action<Boolean> registerWithPreferenceMessage = new RegisterWithPreferenceMessage(student, course, grade);
         actions.add(registerWithPreferenceMessage);
         then(actions, () -> {
             if(actions.get(0).getResult().get()) {
@@ -45,8 +46,9 @@ public class RegisterWithPreferenceAction extends Action<Boolean> {
                 privateState.addRecord(getActionName());
             }
             else {
-                RegisterWithPreferenceAction nextCourse = new RegisterWithPreferenceAction(student, courses, grade);
-                sendMessage(nextCourse, course, privateState);
+                complete(false);
+                RegisterWithPreferenceAction nextCourse = new RegisterWithPreferenceAction(student, courses, Arrays.copyOfRange(this.grade, 1, this.grade.length));
+                sendMessage(nextCourse, actorID, privateState);
             }
         });
         sendMessage(registerWithPreferenceMessage, course, new CoursePrivateState());
