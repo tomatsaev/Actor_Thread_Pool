@@ -2,6 +2,7 @@ package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
+import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
 public class AddStudentAction extends Action<String> {
     String department;
@@ -25,6 +26,7 @@ public class AddStudentAction extends Action<String> {
     protected void start() {
         DepartmentPrivateState privateState = (DepartmentPrivateState) pool.getPrivateState(actorID);
         privateState.getStudentList().add(student);
+        sendMessage(new AddStudentMessage(), student, new StudentPrivateState()); // only in order to open an Actor for him
         privateState.addRecord(getActionName());
         complete("Student " + student + " was added to " + department + " department successfully");
         System.out.println("Student " + student + " was added to " + department + " department successfully");
