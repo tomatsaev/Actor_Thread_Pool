@@ -12,6 +12,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
+ *
+ * SUBMITTED: Tom Matsaev 318864550 & OR Saar 205476369
+ *
  * represents an actor thread pool - to understand what this class does please
  * refer to your assignment.
  *

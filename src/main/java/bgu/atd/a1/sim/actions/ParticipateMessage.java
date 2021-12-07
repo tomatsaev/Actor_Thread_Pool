@@ -3,6 +3,7 @@ package bgu.atd.a1.sim.actions;
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ public class ParticipateMessage extends Action<Boolean> {
     protected void start() {
         StudentPrivateState studentPrivateState = (StudentPrivateState) pool.getPrivateState(actorID);
         for (String course : prerequisites)
-            if (!studentPrivateState.getGrades().containsKey(course)){
+            if (!Arrays.stream(grades).anyMatch(course::equals)){
                 complete(false);
                 return;
             }

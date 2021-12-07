@@ -39,16 +39,16 @@ public class ParticipateInCourseAction extends Action<String> {
             List<Action<Boolean>> actions = new ArrayList<>();
             Action<Boolean> participateMessage = new ParticipateMessage(student, course, grades, coursePrivateState.getPrerequisites());
             actions.add(participateMessage);
-            coursePrivateState.addStudent(student);
             then(actions, () -> {
                 if (participateMessage.getResult().get()) {
+                    coursePrivateState.addStudent(student);
                     complete("Student " + student + " is participating course " + course + " successfully.");
                     System.out.println("Student " + student + " is participating course " + course + " successfully, with " + coursePrivateState.getAvailableSpots() + " spots left");
                     coursePrivateState.addRecord(getActionName());
                 }
                 else {
                     complete("Student " + student + " doesnt meet prerequisites to participate at " + course + " course.");
-                    System.out.println("No room available for Student " + student + " to participate at " + course + " course.");
+                    System.out.println("Student " + student + " doesnt meet prerequisites to participate at " + course + " course.");
                 }
             });
             sendMessage(participateMessage, student, new StudentPrivateState());

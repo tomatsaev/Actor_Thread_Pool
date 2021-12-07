@@ -10,9 +10,8 @@ import java.util.List;
 public class CloseCourseMessage extends Action<Boolean> {
     String course;
 
-    public CloseCourseMessage(String department, String course) {
+    public CloseCourseMessage(String course) {
         this.course = course;
-        setActionName("Close Course Message");
     }
 
     @Override
@@ -23,16 +22,25 @@ public class CloseCourseMessage extends Action<Boolean> {
             Action<Boolean> removeGrade = new RemoveCourseGradeMessage(course);
             actions.add(removeGrade);
         }
+        if(actions.isEmpty()){
+            closeCourseAndComplete(coursePrivateState);
+            return;
+        }
         then(actions, () -> {
-            coursePrivateState.setAvailableSpots(-1);
-            coursePrivateState.setRegStudents(new ArrayList<>());
-            coursePrivateState.setRegistered(0);
-            complete(true);
-            coursePrivateState.addRecord(getActionName());
+            closeCourseAndComplete(coursePrivateState);
         });
         for (int i = 0; i < actions.size(); i++) {
             sendMessage(actions.get(i), coursePrivateState.getRegStudents().get(i), new StudentPrivateState());
         }
 
     }
+
+    private void closeCourseAndComplete(CoursePrivateState coursePrivateState){
+        coursePrivateState.setAvailableSpots(-1);
+        coursePrivateState.setRegStudents(new ArrayList<>());
+        coursePrivateState.setRegistered(0);
+        complete(true);
+        coursePrivateState.addRecord(getActionName());
+    }
+
 }
