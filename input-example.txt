@@ -96,20 +96,20 @@
 "Students": ["123456789","5959595959"],
 "Computer": "A",
 "Conditions" : ["SPL", "Data Bases"]
-}
-],
-"Phase 3": [
+},
 {
 "Action": "Register With Preferences",
 "Student": "5959595959",
 "Preferences": ["Data Bases","SPL"],
 "Grade": ["98","56"]
-},
+}
+],
+"Phase 3": [
 {
 "Action" : "Administrative Check",
 "Department": "CS",
 "Students": ["123456789","5959595959"],
-"Computer": "A",
+"Computer": "B",
 "Conditions" : ["SPL", "Data Bases"]
 }
 ]
