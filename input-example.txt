@@ -1,5 +1,5 @@
 {
-"threads": 3,
+"threads": 10,
 "Computers" : [
 {
 "Type":"A",
@@ -32,6 +32,13 @@
 "Department": "CS",
 "Course": "Data Structures",
 "Space": "100",
+"Prerequisites" :  ["Intro To CS"]
+},
+{
+"Action":"Open Course",
+"Department": "CS",
+"Course": "Algo",
+"Space": "2",
 "Prerequisites" :  ["Intro To CS"]
 },
 {
@@ -86,6 +93,12 @@
 "Grade": ["90"]
 },
 {
+"Action": "Participate In Course",
+"Student": "123456789",
+"Course": "Algo",
+"Grade": ["80"]
+},
+{
 "Action": "Unregister",
 "Student": "123456789",
 "Course": "Data Structures"
@@ -96,6 +109,13 @@
 "Students": ["123456789","5959595959"],
 "Computer": "A",
 "Conditions" : ["SPL", "Data Structures"]
+},
+{
+"Action" : "Administrative Check",
+"Department": "CS",
+"Students": ["123456789","5959595959"],
+"Computer": "B",
+"Conditions" : ["Algo", "Data Structures"]
 }
 ]
 }

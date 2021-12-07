@@ -19,7 +19,6 @@ public abstract class Action<R> {
 
     private final Promise<R> promise = new Promise<>();
     protected ActorThreadPool pool;
-//    private final AtomicInteger dependenciesCounter = new AtomicInteger(0);
     protected String actorID;
     private Boolean started = false;
     private PrivateState actorState;
@@ -94,7 +93,6 @@ public abstract class Action<R> {
      * @param result - the action calculated result
      */
     protected final void complete(R result) {
-//        Stream.of(this.actorState.getLogger()).forEach(System.out::println);
         this.promise.resolve(result);
     }
 

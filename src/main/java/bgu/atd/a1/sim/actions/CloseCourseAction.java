@@ -1,7 +1,6 @@
 package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
-import bgu.atd.a1.sim.actions.messages.CloseCourseMessage;
 import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 
@@ -33,7 +32,6 @@ public class CloseCourseAction extends Action<String> {
         actions.add(closeCourse);
         then(actions, ()->{
             if(actions.get(0).getResult().get()) {
-//                privateState.getCourseList().remove(course);
                 complete("Course " + course + " was removed from " + department + " department successfully");
                 System.out.println("Course " + course + " was removed from " + department + " department successfully");
             }

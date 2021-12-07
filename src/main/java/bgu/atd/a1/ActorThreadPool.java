@@ -90,7 +90,6 @@ public class ActorThreadPool {
 
 		currentActions.incrementAndGet();
 		actionsByActorID.get(actorId).add(action);
-//		System.out.println("submit: Number of actions after increment: " + currentActions.get());
 
 		synchronized (threadsLock) {
 			if (activeThreads.size() < nthreads && activeThreads.size() < playingNowCount()) {
@@ -118,13 +117,6 @@ public class ActorThreadPool {
 		while (currentActions.get() != 0) {
 			Thread.sleep(1000);
 		}
-//		for (Thread thread: activeThreads) {
-//			synchronized (threadsLock) {
-//				threadsLock.notify();
-//				thread.join();
-//				System.out.println("shutdown: found an active thread: " + thread.getName());
-//			}
-//		}
 		for (Thread thread: sleepingThreads) {
 			synchronized (threadsLock) {
 				threadsLock.notify();
@@ -143,7 +135,6 @@ public class ActorThreadPool {
 		for (int i = 0; i < nthreads; i++) {
 			Thread worker = new Thread(this::task);
 			worker.setName("Worker " + (i));
-//			sleepingThreads.add(worker);
 			activeThreads.add(worker);
 			worker.start();
 		}

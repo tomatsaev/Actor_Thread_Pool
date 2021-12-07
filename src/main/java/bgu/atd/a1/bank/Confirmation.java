@@ -25,12 +25,7 @@ public class Confirmation extends Action<Boolean> {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        List<Action<Boolean>> actions = new ArrayList<>();
-//        Action<Boolean> confAction = new Confirmation(sender, receiver, receiverBank, new BankStates());
-//        actions.add(confAction);
-//
-//        then(actions, () -> System.out.println("bank2 subscribe"));
-//        sendMessage(confAction, receiverBank, new BankStates());
+
         bankStates.addRecord(receiver + " got from " + sender + " to " + receiverBank);
         System.out.println("confirmation: " + receiver + " got from " + sender + " to " + receiverBank);
         complete(true);

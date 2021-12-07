@@ -2,8 +2,6 @@ package bgu.atd.a1.sim.actions;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.sim.Computer;
-import bgu.atd.a1.sim.actions.messages.GetComputerMessage;
-import bgu.atd.a1.sim.actions.messages.MeetsObligationsMessage;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 import bgu.atd.a1.sim.privateStates.WarehousePrivateState;
