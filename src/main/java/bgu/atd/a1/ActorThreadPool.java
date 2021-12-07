@@ -25,7 +25,7 @@ public class ActorThreadPool {
 
 	private final Integer nthreads;
 	private final AtomicInteger currentActions = new AtomicInteger(0);
-	protected AtomicBoolean terminate = new AtomicBoolean(false);
+	private final AtomicBoolean terminate = new AtomicBoolean(false);
 	private final List<Thread> activeThreads = new ArrayList<>();
 	private final List<Thread> sleepingThreads = new ArrayList<>();
 	private final Lock threadsLock  = new ReentrantLock();
@@ -140,7 +140,11 @@ public class ActorThreadPool {
 		}
 
 	}
+
+//		must be holding threadsLock
 	private int playingNowCount() {
+		if (!Thread.holdsLock(threadsLock))
+			throw new RuntimeException("threadLock not held in playingNowCount");
 		int counter = 0;
 		for (Queue<Action<?>> actions : actionsByActorID.values())
 				if (!actions.isEmpty())

@@ -92,9 +92,9 @@ public class Promise<T>{
 		while(callbacks.peek() != null){
 			callbacks.poll().call();
 		}
+
 		resolving.set(false);
 	}
-
 	/**
 	 * add a callback to be called when this object is resolved. If while
 	 * calling this method the object is already resolved - the callback should
@@ -108,12 +108,16 @@ public class Promise<T>{
 	 * @param callback
 	 *            the callback to be called when the promise object is resolved
 	 */
-	public synchronized void subscribe(callback callback) {
-		if(isResolved.get() && !resolving.get()){
+	public void subscribe(callback callback) {
+		if(!resolving.get() && isResolved.get()){
 			callback.call();
 		}
-		else{
+		else {
 			this.callbacks.add(callback);
+			if (isResolved.get() && !resolving.get()) {
+				if (this.callbacks.remove(callback))
+					callback.call();
+			}
 		}
 	}
 }

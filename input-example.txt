@@ -1,5 +1,5 @@
 {
-"threads": 10,
+"threads": 8,
 "Computers" : [
 {
 "Type":"A",
@@ -16,40 +16,33 @@
 {
 "Action":"Open Course",
 "Department": "CS",
-"Course": "Intro To CS",
-"Space": "200",
-"Prerequisites" : []
-},
-{
-"Action":"Open Course",
-"Department": "CS",
 "Course": "SPL",
-"Space": "1",
-"Prerequisites" : ["Intro To CS"]
+"Space": "400",
+"Prerequisites" : ["Intro to CS"]
 },
 {
 "Action":"Open Course",
 "Department": "CS",
-"Course": "Data Structures",
-"Space": "100",
-"Prerequisites" :  ["Intro To CS"]
+"Course": "Data Bases",
+"Space": "30",
+"Prerequisites" : ["SPL"]
 },
 {
 "Action":"Open Course",
 "Department": "CS",
-"Course": "Algo",
-"Space": "2",
-"Prerequisites" :  ["Intro To CS"]
-},
-{
-"Action": "Add Student",
-"Department": "CS",
-"Student": "123456789"
+"Course": "Intro to CS",
+"Space": "30",
+"Prerequisites" : []
 },
 {
 "Action": "Add Student",
 "Department": "CS",
 "Student": "5959595959"
+},
+{
+"Action": "Add Student",
+"Department": "CS",
+"Student": "123456789"
 }
 ],
 "Phase 2" : [
@@ -58,64 +51,66 @@
 "Department": "Math",
 "Student": "132424353"
 },
-
-{
-"Action": "Participate In Course",
-"Student": "123456789",
-"Course": "Intro To CS",
-"Grade": ["77"]
-},
-
 {
 "Action": "Participate In Course",
 "Student": "5959595959",
-"Course": "Intro To CS",
-"Grade": ["94"]
+"Course": "Intro to CS",
+"Grade": ["93"]
 },
 {
 "Action": "Participate In Course",
-"Student": "5959595959",
-"Course": "SPL",
-"Grade": ["100"]
-}
-],
-"Phase 3": [
-{
-"Action": "Participate In Course",
-"Student": "123456789",
+"Student": "132424353",
 "Course": "SPL",
 "Grade": ["98"]
 },
 {
-"Action": "Participate In Course",
-"Student": "123456789",
-"Course": "Data Structures",
-"Grade": ["90"]
+"Action": "Add Spaces",
+"Course": "SPL",
+"Number": "100"
 },
 {
 "Action": "Participate In Course",
 "Student": "123456789",
-"Course": "Algo",
-"Grade": ["80"]
+"Course": "Data Bases",
+"Grade": ["-"]
+},
+{
+"Action": "Participate In Course",
+"Student": "5959595959",
+"Course": "Data Bases",
+"Grade": ["-"]
 },
 {
 "Action": "Unregister",
 "Student": "123456789",
-"Course": "Data Structures"
+"Course": "Data Bases"
+},
+{
+"Action": "Close Course",
+"Department": "CS",
+"Course": "Data Bases"
 },
 {
 "Action" : "Administrative Check",
 "Department": "CS",
 "Students": ["123456789","5959595959"],
 "Computer": "A",
-"Conditions" : ["SPL", "Data Structures"]
+"Conditions" : ["SPL", "Data Bases"]
+}
+],
+"Phase 3": [
+{
+"Action": "Register With Preferences",
+"Student": "5959595959",
+"Preferences": ["Data Bases","SPL"],
+"Grade": ["98","56"]
 },
 {
 "Action" : "Administrative Check",
 "Department": "CS",
 "Students": ["123456789","5959595959"],
-"Computer": "B",
-"Conditions" : ["Algo", "Data Structures"]
+"Computer": "A",
+"Conditions" : ["SPL", "Data Bases"]
 }
 ]
 }

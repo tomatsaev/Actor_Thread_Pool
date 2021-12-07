@@ -25,6 +25,8 @@ public class CloseCourseMessage extends Action<Boolean> {
         }
         then(actions, () -> {
             coursePrivateState.setAvailableSpots(-1);
+            coursePrivateState.setRegStudents(new ArrayList<>());
+            coursePrivateState.setRegistered(0);
             complete(true);
             coursePrivateState.addRecord(getActionName());
         });
