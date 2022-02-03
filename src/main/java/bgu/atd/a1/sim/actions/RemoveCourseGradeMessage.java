@@ -17,6 +17,7 @@ public class RemoveCourseGradeMessage extends Action<Boolean> {
         if (studentPrivateState.getGrades().remove(course) != null) {
             System.out.println("student " + actorID + " removed "+ course + " course");
             complete(true);
+            return;
         }
         complete(false);
     }

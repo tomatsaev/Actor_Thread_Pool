@@ -9,8 +9,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import bgu.atd.a1.Action;
 import bgu.atd.a1.ActorThreadPool;
@@ -20,8 +18,7 @@ import bgu.atd.a1.sim.privateStates.CoursePrivateState;
 import bgu.atd.a1.sim.privateStates.DepartmentPrivateState;
 import bgu.atd.a1.sim.privateStates.StudentPrivateState;
 import com.google.gson.*;
-import javafx.util.Pair;
-// TODO: change pair to AbstractMap.simpleEntry
+import util.Pair;
 
 /**
  * A class describing the simulator for part 2 of the assignment
@@ -32,6 +29,9 @@ public class Simulator {
     public static ActorThreadPool actorThreadPool;
     public static Warehouse warehouse;
     private static Integer nthreads;
+    private static ArrayList<Action<?>> phase1ActionsArray;
+    private static ArrayList<Action<?>> phase2ActionsArray;
+    private static ArrayList<Action<?>> phase3ActionsArray;
     private static Map<Action<?>, Pair<String, PrivateState>> phase1Actions;
     private static Map<Action<?>, Pair<String, PrivateState>> phase2Actions;
     private static Map<Action<?>, Pair<String, PrivateState>> phase3Actions;
@@ -47,21 +47,21 @@ public class Simulator {
             CountDownLatch phase3Countdown = new CountDownLatch(phase3Actions.size());
 
             System.out.println("PHASE 1:");
-            for (Action<?> action : phase1Actions.keySet()) {
+            for (Action<?> action : phase1ActionsArray) {
                 actorThreadPool.submit(action, phase1Actions.get(action).getKey(), phase1Actions.get(action).getValue());
                 action.getResult().subscribe(() ->
                         action.getResult().subscribe(phase1Countdown::countDown));
             }
             phase1Countdown.await();
             System.out.println("PHASE 2:");
-            for (Action<?> action : phase2Actions.keySet()) {
+            for (Action<?> action : phase2ActionsArray) {
                 actorThreadPool.submit(action, phase2Actions.get(action).getKey(), phase2Actions.get(action).getValue());
                 action.getResult().subscribe(() ->
                         action.getResult().subscribe(phase2Countdown::countDown));
             }
             phase2Countdown.await();
             System.out.println("PHASE 3:");
-            for (Action<?> action : phase3Actions.keySet()) {
+            for (Action<?> action : phase3ActionsArray) {
                 actorThreadPool.submit(action, phase3Actions.get(action).getKey(), phase3Actions.get(action).getValue());
                 action.getResult().subscribe(() ->
                         action.getResult().subscribe(phase3Countdown::countDown));
@@ -94,7 +94,8 @@ public class Simulator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return (HashMap<String,PrivateState>)actorThreadPool.getActors();
+
+        return new HashMap<String, PrivateState>(actorThreadPool.getActors());
     }
 
 
@@ -103,12 +104,12 @@ public class Simulator {
         attachActorThreadPool(new ActorThreadPool(nthreads));
         actorThreadPool.start();
         start();
-        try{
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            FileWriter outputFile = new FileWriter("result.json");
-            Output outputObject = new Output(end());
-            gson.toJson(outputObject,outputFile);
-            outputFile.close(); // close file after finish writing
+        Map<String, PrivateState> simResult;
+        simResult = end();
+        try {
+            FileOutputStream fout = new FileOutputStream("result.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeObject(simResult);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -144,31 +145,34 @@ public class Simulator {
             // Extracting Phase 1
             JsonArray jsonArrayOfPhase1 = fileObject.get("Phase 1").getAsJsonArray();
             phase1Actions = new HashMap<>();
+            phase1ActionsArray = new ArrayList<>();
             for (JsonElement phase1ActionElement : jsonArrayOfPhase1) {
                 JsonObject phase1ActionObject = phase1ActionElement.getAsJsonObject();
 
                 // Find the Action Type
-                extractActionFromJson(phase1ActionObject, phase1Actions);
+                extractActionFromJson(phase1ActionObject, phase1Actions, phase1ActionsArray);
             }
 
             // Extracting Phase 2
             JsonArray jsonArrayOfPhase2 = fileObject.get("Phase 2").getAsJsonArray();
             phase2Actions = new HashMap<>();
+            phase2ActionsArray = new ArrayList<>();
             for (JsonElement phase2ActionElement : jsonArrayOfPhase2) {
                 JsonObject phase2ActionObject = phase2ActionElement.getAsJsonObject();
 
                 // Find the Action Type
-                extractActionFromJson(phase2ActionObject, phase2Actions);
+                extractActionFromJson(phase2ActionObject, phase2Actions, phase2ActionsArray);
             }
 
             // Extracting Phase 3
             JsonArray jsonArrayOfPhase3 = fileObject.get("Phase 3").getAsJsonArray();
             phase3Actions = new HashMap<>();
+            phase3ActionsArray = new ArrayList<>();
             for (JsonElement phase3ActionElement : jsonArrayOfPhase3) {
                 JsonObject phase3ActionObject = phase3ActionElement.getAsJsonObject();
 
                 // Find the Action Type
-                extractActionFromJson(phase3ActionObject, phase3Actions);
+                extractActionFromJson(phase3ActionObject, phase3Actions, phase3ActionsArray);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -176,9 +180,9 @@ public class Simulator {
 
     }
 
-    private static void extractActionFromJson(JsonObject actionObject, Map phaseMap) {
+    private static void extractActionFromJson(JsonObject actionObject, Map<Action<?>, Pair<String, PrivateState>> phaseMap, ArrayList<Action<?>> phaseArray) {
         String actionName = actionObject.get("Action").getAsString();
-        Action action = null;
+        Action<?> action = null;
         String actorID = null;
         PrivateState privateState = null;
         switch (actionName) {
@@ -262,7 +266,7 @@ public class Simulator {
             case "Register With Preferences":
                 student = actionObject.get("Student").getAsString();
                 JsonArray coursesJsonArray = actionObject.get("Preferences").getAsJsonArray();
-                List<String> courses = new ArrayList();
+                List<String> courses = new ArrayList<>();
                 for (int i = 0; i < coursesJsonArray.size(); i++) {
                     courses.add(coursesJsonArray.get(i).getAsString());
                 }
@@ -277,6 +281,7 @@ public class Simulator {
                 break;
 
         }
+        phaseArray.add(action);
         phaseMap.put(action, new Pair<>(actorID, privateState));
     }
 }

@@ -35,27 +35,20 @@ public class ParticipateInCourseAction extends Action<String> {
     @Override
     protected void start() {
         CoursePrivateState coursePrivateState = (CoursePrivateState) pool.getPrivateState(actorID);
-        if(coursePrivateState.getAvailableSpots() > 0) {
-            List<Action<Boolean>> actions = new ArrayList<>();
-            Action<Boolean> participateMessage = new ParticipateMessage(student, course, grades, coursePrivateState.getPrerequisites());
-            actions.add(participateMessage);
-            then(actions, () -> {
-                if (participateMessage.getResult().get()) {
-                    coursePrivateState.addStudent(student);
-                    complete("Student " + student + " is participating course " + course + " successfully.");
-                    System.out.println("Student " + student + " is participating course " + course + " successfully, with " + coursePrivateState.getAvailableSpots() + " spots left");
-                    coursePrivateState.addRecord(getActionName());
-                }
-                else {
-                    complete("Student " + student + " doesnt meet prerequisites to participate at " + course + " course.");
-                    System.out.println("Student " + student + " doesnt meet prerequisites to participate at " + course + " course.");
-                }
-            });
-            sendMessage(participateMessage, student, new StudentPrivateState());
-        }
-        else{
-            complete("No room available for Student " + student + " to participate at " + course + " course.");
-            System.out.println("No room available for Student " + student + " to participate course " + course + " course.");
-        }
+        List<Action<Boolean>> actions = new ArrayList<>();
+        Action<Boolean> participateMessage = new ParticipateMessage(student, course, grades, coursePrivateState.getPrerequisites());
+        actions.add(participateMessage);
+        then(actions, () -> {
+            if (participateMessage.getResult().get() && coursePrivateState.getAvailableSpots() > 0) {
+                coursePrivateState.addStudent(student);
+                complete("Student " + student + " is participating course " + course + " successfully.");
+                System.out.println("Student " + student + " is participating course " + course + " successfully, with " + coursePrivateState.getAvailableSpots() + " spots left");
+                coursePrivateState.addRecord(getActionName());
+            } else {
+                complete("Student " + student + " doesnt meet prerequisites to participate at " + course + " course OR No room available for Student" + student + " to participate at " + course + " course.");
+                System.out.println("Student " + student + " doesnt meet prerequisites to participate at " + course + " course.");
+            }
+        });
+        sendMessage(participateMessage, student, new StudentPrivateState());
     }
 }

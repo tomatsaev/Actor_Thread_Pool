@@ -14,7 +14,6 @@ public class UnregisterMessage extends Action<Boolean> {
     @Override
     protected void start() {
         ((StudentPrivateState)pool.getPrivateState(actorID)).getGrades().remove(course);
-        pool.getPrivateState(actorID).addRecord(getActionName());
         complete(true);
     }
 }

@@ -24,16 +24,14 @@ public class ParticipateMessage extends Action<Boolean> {
     @Override
     protected void start() {
         StudentPrivateState studentPrivateState = (StudentPrivateState) pool.getPrivateState(actorID);
-        for (String course : prerequisites)
-            if (!Arrays.stream(grades).anyMatch(course::equals)){
-                complete(false);
-                return;
-            }
+        if (!studentPrivateState.getCourses().containsAll(prerequisites) || studentPrivateState.getCourses().contains(course)) {
+            complete(false);
+            return;
+        }
         if (!Objects.equals(grades[0], "-"))
             studentPrivateState.getGrades().put(course, Integer.valueOf(grades[0]));
         else
             studentPrivateState.getGrades().put(course, -1);
-
         complete(true);
     }
 }

@@ -1,10 +1,7 @@
 package bgu.atd.a1.sim;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * represents a warehouse that holds a finite amount of computers

@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
- * SUBMITTED: Tom Matsaev 318864550 & OR Saar 205476369
+ * SUBMITTED: Tom Matsaev 318864550 & Or Saar 205476369
  *
  * represents an actor thread pool - to understand what this class does please
  * refer to your assignment.
@@ -32,7 +32,7 @@ public class ActorThreadPool {
 	private final List<Thread> activeThreads = new ArrayList<>();
 	private final List<Thread> sleepingThreads = new ArrayList<>();
 	private final Lock threadsLock  = new ReentrantLock();
-	private final HashMap<String, PrivateState> actors = new HashMap<>();
+	private final Map<String, PrivateState> actors = new ConcurrentHashMap<>();
 	private final Map<String, Lock> locksByID = new ConcurrentHashMap<>();
 	private final Map<String, Queue<Action<?>>> actionsByActorID = new ConcurrentHashMap<>();
 	public Warehouse warehouse;
@@ -80,8 +80,6 @@ public class ActorThreadPool {
 	 * @param actorState actor's private state (actor's information)
 	 */
 	public void submit(Action<?> action, String actorId, PrivateState actorState) {
-		if (terminate.get())
-			return;
 		actors.putIfAbsent(actorId, actorState);
 		actionsByActorID.putIfAbsent(actorId, new ConcurrentLinkedQueue<>());
 		locksByID.putIfAbsent(actorId, new ReentrantLock());
@@ -113,21 +111,24 @@ public class ActorThreadPool {
 	 * @throws InterruptedException if the thread that shut down the threads is interrupted
 	 */
 	public void shutdown() throws InterruptedException {
-		terminate.set(true);
+		List<Thread> allThreads = new ArrayList<>();
 		System.out.println("shutdown: Number of actions after shutdown: " + currentActions.get());
 		System.out.println("shutdown: Number of active threads after shutdown: " + activeThreads.size());
 		System.out.println("shutdown: Number of sleeping threads after shutdown: " + sleepingThreads.size());
 		while (currentActions.get() != 0) {
 			Thread.sleep(1000);
 		}
-		for (Thread thread: sleepingThreads) {
-			synchronized (threadsLock) {
-				threadsLock.notify();
+		terminate.set(true);
+		synchronized (threadsLock) {
+			for (Thread thread: sleepingThreads) {
+				allThreads.add(thread);
+				threadsLock.notifyAll();
 				System.out.println("shutdown: found a sleeping thread: " + thread.getName());
 			}
+				allThreads.addAll(activeThreads);
 		}
-		for (Thread thread: sleepingThreads) {
-			thread.join();
+			for (Thread thread : allThreads) {
+				thread.join();
 		}
 	}
 
@@ -141,7 +142,6 @@ public class ActorThreadPool {
 			activeThreads.add(worker);
 			worker.start();
 		}
-
 	}
 
 //		must be holding threadsLock
@@ -164,9 +164,12 @@ public class ActorThreadPool {
 					System.out.println("task: found self " + activeThreads.remove(Thread.currentThread()));
 					sleepingThreads.add(Thread.currentThread());
 					try {
-						threadsLock.wait();
-						if (terminate.get())
+						if (!terminate.get())
+							threadsLock.wait();
+						if (terminate.get()){
+							System.out.println("thread: " + Thread.currentThread().getName()+ " is saying bye bye");
 							return;
+						}
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

@@ -46,9 +46,9 @@ public class RegisterWithPreferenceAction extends Action<Boolean> {
                 privateState.addRecord(getActionName());
             }
             else {
-                complete(false);
                 RegisterWithPreferenceAction nextCourse = new RegisterWithPreferenceAction(student, courses, Arrays.copyOfRange(this.grade, 1, this.grade.length));
                 sendMessage(nextCourse, actorID, privateState);
+                complete(false);
             }
         });
         sendMessage(registerWithPreferenceMessage, course, new CoursePrivateState());
