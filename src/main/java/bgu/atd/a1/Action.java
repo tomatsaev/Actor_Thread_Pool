@@ -8,11 +8,6 @@ import java.util.stream.Stream;
  * an abstract class that represents an action that may be executed using the
  * {@link ActorThreadPool}
  *
- * Note for implementors: you may add methods and synchronize any of the
- * existing methods in this class *BUT* you must be able to explain why the
- * synchronization is needed. In addition, the methods you add to this class can
- * only be private!
- *
  * @param <R> the action result type
  */
 public abstract class Action<R> {
@@ -25,8 +20,7 @@ public abstract class Action<R> {
     private callback callback;
 
     /**
-     * start handling the action - note that this method is protected, a thread
-     * cannot call it directly.
+     * start handling the action 
      */
     protected abstract void start();
 
@@ -35,12 +29,8 @@ public abstract class Action<R> {
      *
      * start/continue handling the action
      *
-     * this method should be called in order to start this action
+     * this method is called in order to start this action
      * or continue its execution in the case where it has been already started.
-     *
-     * IMPORTANT: this method is package protected, i.e., only classes inside
-     * the same package can access it - you should *not* change it to
-     * public/private/protected
      *
      */
     /*package*/ final void handle(ActorThreadPool pool, String actorId, PrivateState actorState) {
@@ -65,7 +55,7 @@ public abstract class Action<R> {
      * add a callback to be executed once *all* the given actions results are
      * resolved
      *
-     * Implementors note: make sure that the callback is running only once when
+     * The callback is running only once when
      * all the given actions completed.
      *
      * @param actions - actions
@@ -87,7 +77,7 @@ public abstract class Action<R> {
     }
 
     /**
-     * resolve the internal result - should be called by the action derivative
+     * resolve the internal result - called by the action derivative
      * once it is done.
      *
      * @param result - the action calculated result
